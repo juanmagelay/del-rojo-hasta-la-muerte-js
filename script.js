@@ -1,5 +1,5 @@
 let app;
-let conejitos = [];
+let bunnies = [];
 const height = 720;
 const width = 1280;
 
@@ -14,13 +14,12 @@ async function initPIXI() {
     const texture = await PIXI.Assets.load("bunny.png");
 
     for ( let i = 0; i < 10; i++ ) {
-        const conejito = new PIXI.Sprite( texture );
-        conejito.x = Math.random() * width;
-        conejito.y = Math.random() * height;
-        conejitos.push ( conejito );
-        app.stage.addChild( conejito );
+        const bunny = new PIXI.Sprite( texture );
+        bunny.x = Math.random() * width;
+        bunny.y = Math.random() * height;
+        bunnies.push ( bunny );
+        app.stage.addChild( bunny );
     }
-  
 }
 
 initPIXI();
