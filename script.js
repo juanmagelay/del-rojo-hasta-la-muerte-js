@@ -15,8 +15,8 @@ async function initPIXI() {
 
     for ( let i = 0; i < 10; i++ ) {
         const conejito = new PIXI.Sprite( texture );
-        conejitos.x = Math.random() * width;
-        conejitos.y = Math.random() * height;
+        conejito.x = Math.random() * width;
+        conejito.y = Math.random() * height;
         conejitos.push ( conejito );
         app.stage.addChild( conejito );
     }
