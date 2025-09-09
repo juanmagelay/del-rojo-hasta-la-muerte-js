@@ -35,28 +35,27 @@ class Juego {
 
     //Create 10 instances of bunny class
     for ( let i = 0; i < 100; i++ ) {
-        const x = Math.random() * this.width;
-        const y = Math.random() * this.height;
-        
-        //Create an instance of bunny class, and the constructor of this class takes the bunnyTexture as a parameter.
-        //Use x, y and a reference to the game instance (this)
-        const bunny = new Conejito( bunnyTexture, x, y, this );
-        this.bunnies.push( bunny );
+      const x = Math.random() * this.width;
+      const y = Math.random() * this.height;
+      
+      //Create an instance of bunny class, and the constructor of this class takes the bunnyTexture as a parameter.
+      //Use x, y and a reference to the game instance (this)
+      const bunny = new Conejito( bunnyTexture, x, y, this );
+      this.bunnies.push( bunny );
 
-        //Add the method this.gameLoop to the ticker.
-        //In each frame we are executing the this.gameLoop method.
-        this.pixiApp.ticker.add(() => {
-            this.gameLoop();
-        });
-    }
-    }
-        gameLoop( time ) {
-        
-        //Iterate for each of the bunnies.
-        for (let aBunny of this.bunnies) {
-        
-            //Execute the tick method of each bunny.
-            aBunny.tick();
-        }
+      //Add the method this.gameLoop to the ticker.
+      //In each frame we are executing the this.gameLoop method.
+      this.pixiApp.ticker.add(() => {
+          this.gameLoop();
+      });
     }
   }
+
+  gameLoop( time ) {
+    //Iterate for each of the bunnies.
+    for (let aBunny of this.bunnies) {
+        //Execute the tick method of each bunny.
+        aBunny.tick();
+    }
+  }
+}
