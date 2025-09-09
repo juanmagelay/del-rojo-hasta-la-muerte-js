@@ -1,4 +1,4 @@
-class Juego {
+class Game {
   pixiApp;
   bunnies = [];
   width;
@@ -30,6 +30,17 @@ class Juego {
     //Add canvas element created by Pixi into the HTML document
     document.body.appendChild(this.pixiApp.canvas);
 
+    //Load the background
+    const bgTexture = await PIXI.Assets.load("stadium.png");
+    const background = new PIXI.Sprite(bgTexture);
+    background.x = 0;
+    background.y = 0;
+    background.width = this.width;
+    background.height = this.height;
+
+    // Load the background first (to be behind NPCs)
+    this.pixiApp.stage.addChild(background);
+    
     //Load the bunnies
     const bunnyTexture = await PIXI.Assets.load("bunny.png");
 
@@ -40,7 +51,7 @@ class Juego {
       
       //Create an instance of bunny class, and the constructor of this class takes the bunnyTexture as a parameter.
       //Use x, y and a reference to the game instance (this)
-      const bunny = new Conejito( bunnyTexture, x, y, this );
+      const bunny = new Bunny( bunnyTexture, x, y, this );
       this.bunnies.push( bunny );
 
       //Add the method this.gameLoop to the ticker.
