@@ -1,0 +1,62 @@
+class Juego {
+  pixiApp;
+  bunnies = [];
+  width;
+  height;
+
+  constructor() {
+    this.width = 1280;
+    this.height = 720;
+    this.initPIXI();    
+  }
+
+  //Async method. It can use "await".
+  async initPIXI() {
+    
+    //Create pixiApp and store it into pixiApp property.
+    this.pixiApp = new PIXI.Application();
+
+    const pixiOptions = { 
+        background: "#1099bb", 
+        width: this.width, 
+        height: this.height 
+    };
+    
+    //Init pixiApp with options declared before.
+    //Await tells that the code is in pause until pixiApp init method has finished.
+    //2ms., 400mx. (...) I don't know how much time.
+    await this.pixiApp.init( pixiOptions );
+
+    //Add canvas element created by Pixi into the HTML document
+    document.body.appendChild(this.pixiApp.canvas);
+
+    //Load the bunnies
+    const bunnyTexture = await PIXI.Assets.load("bunny.png");
+
+    //Create 10 instances of bunny class
+    for ( let i = 0; i < 100; i++ ) {
+        const x = Math.random() * this.width;
+        const y = Math.random() * this.height;
+        
+        //Create an instance of bunny class, and the constructor of this class takes the bunnyTexture as a parameter.
+        //Use x, y and a reference to the game instance (this)
+        const bunny = new Conejito( bunnyTexture, x, y, this );
+        this.bunnies.push( bunny );
+
+        //Add the method this.gameLoop to the ticker.
+        //In each frame we are executing the this.gameLoop method.
+        this.pixiApp.ticker.add(() => {
+            this.gameLoop();
+        });
+    }
+    }
+        gameLoop( time ) {
+        
+        //Iterate for each of the bunnies.
+        for (let aBunny of this.bunnies) {
+        
+            //Execute the tick method of each bunny.
+            aBunny.tick();
+        }
+    }
+  }
