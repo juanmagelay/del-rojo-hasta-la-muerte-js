@@ -22,8 +22,8 @@ class Bunny {
     this.sprite.anchor.set(0.5);
 
     //Velocity random between 0 and 1
-    this.velocityX = Math.random() * 10;
-    this.velocityY = Math.random() * 10;
+    this.velocityX = Math.random() * 1;
+    this.velocityY = Math.random() * 1;
 
     //Add the sprite to the stage.
     //this.game is a reference to the Game class instance.
