@@ -7,6 +7,7 @@ class Game {
   constructor() {
     this.width = 1280;
     this.height = 720;
+    this.mouse = { position: { x: 0, y: 0 } };
     this.initPIXI();    
   }
 
@@ -45,7 +46,7 @@ class Game {
     const bunnyTexture = await PIXI.Assets.load("bunny.png");
 
     //Create 10 instances of bunny class
-    for ( let i = 0; i < 10; i++ ) {
+    for ( let i = 0; i < 100; i++ ) {
       const x = Math.random() * this.width;
       const y = Math.random() * this.height;
       
@@ -53,13 +54,32 @@ class Game {
       //Use x, y and a reference to the game instance (this)
       const bunny = new Bunny( bunnyTexture, x, y, this );
       this.bunnies.push( bunny );
-
-      //Add the method this.gameLoop to the ticker.
-      //In each frame we are executing the this.gameLoop method.
-      this.pixiApp.ticker.add(() => {
-          this.gameLoop();
-      });
     }
+
+    // Assign targets and persecutors to make bunnies move
+    this.assignTargets();
+    this.assignRandomPersecutorForAllBunnies();
+    
+    // Debug: Log bunny setup
+    console.log(`Created ${this.bunnies.length} bunnies`);
+    for (let bunny of this.bunnies) {
+      console.log(`Bunny ${bunny.id}: target=${bunny.target ? bunny.target.id || 'mouse' : 'none'}, persecutor=${bunny.persecutor ? bunny.persecutor.id || 'mouse' : 'none'}`);
+    }
+
+    //Add the method this.gameLoop to the ticker.
+    //In each frame we are executing the this.gameLoop method.
+    this.pixiApp.ticker.add(this.gameLoop.bind(this));
+    
+    this.addMouseInteractivity();
+  }
+
+  //Functions
+
+  addMouseInteractivity() {
+    // Listen to mouse move event
+    this.pixiApp.canvas.onmousemove = (event) => {
+      this.mouse.position = { x: event.x, y: event.y };
+    };
   }
 
   gameLoop( time ) {
@@ -67,6 +87,40 @@ class Game {
     for (let aBunny of this.bunnies) {
         //Execute the tick method of each bunny.
         aBunny.tick();
+        aBunny.render();
+        
+        // Debug: Log bunny movement
+        if (Math.floor(time) % 60 === 0) { // Log every second
+          console.log(`Bunny ${aBunny.id}: pos(${Math.round(aBunny.position.x)}, ${Math.round(aBunny.position.y)}) vel(${Math.round(aBunny.velocity.x*100)/100}, ${Math.round(aBunny.velocity.y*100)/100})`);
+        }
+    }
+  }
+
+  getBunnyRandom() {
+    return this.bunnies[Math.floor(this.bunnies.length * Math.random())];
+  }
+
+  assignTargets() {
+    for (let bun of this.bunnies) {
+      bun.assignTarget(this.getBunnyRandom());
+    }
+  }
+
+  assignMouseAsTargetForAllBunnies() {
+    for (let bun of this.bunnies) {
+      bun.assignTarget(this.mouse);
+    }
+  }
+
+  assignRandomPersecutorForAllBunnies() {
+    for (let bun of this.bunnies) {
+      bun.persecutor = this.getBunnyRandom();
+    }
+  }
+
+  assignMouseAsPersecutorForAllBunnies() {
+    for (let bun of this.bunnies) {
+      bun.persecutor = this.mouse;
     }
   }
 }
