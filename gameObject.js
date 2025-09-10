@@ -17,7 +17,7 @@ class GameObject {
         //Vision and vectors
         this.vision = Math.random() * 200 + 300;
         this.position = { x: x, y: y };
-        this.velocity = { x: Math.random() * 10, y: Math.random() * 10 };
+        this.velocity = { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2 };
         this.acceleration = { x: 0, y: 0 };
 
         //Generate a character ID
@@ -51,6 +51,7 @@ class GameObject {
 
         this.flee(); //escapar
         this.chase(); //perseguir
+        this.wander(); // wander randomly if no strong behavior
         this.limitAcceleration();
         this.velocity.x += this.acceleration.x;
         this.velocity.y += this.acceleration.y;
@@ -68,6 +69,13 @@ class GameObject {
         this.angle = radiansToDegrees(
             Math.atan2(this.velocity.y, this.velocity.x) //This is backguards y, x
         );
+        
+        // Debug: Log if bunny is moving
+        if (Math.abs(this.velocity.x) > 0.01 || Math.abs(this.velocity.y) > 0.01) {
+          // Bunny is moving
+        } else {
+          // Bunny is not moving - this might indicate a problem
+        }
     }
 
     
@@ -113,8 +121,12 @@ class GameObject {
         const difX = this.target.position.x - this.position.x;
         const difY = this.target.position.y - this.position.y;
 
-        this.acceleration.x += difX;
-        this.acceleration.y += difY;
+        // Normalize the direction and apply acceleration
+        const magnitude = Math.sqrt(difX * difX + difY * difY);
+        if (magnitude > 0) {
+          this.acceleration.x += (difX / magnitude) * 0.1;
+          this.acceleration.y += (difY / magnitude) * 0.1;
+        }
     }
 
     flee() {
@@ -125,13 +137,25 @@ class GameObject {
         const difX = this.persecutor.position.x - this.position.x;
         const difY = this.persecutor.position.y - this.position.y;
 
-        this.acceleration.x += -difX;
-        this.acceleration.y += -difY;
+        // Normalize the direction and apply acceleration (opposite direction)
+        const magnitude = Math.sqrt(difX * difX + difY * difY);
+        if (magnitude > 0) {
+          this.acceleration.x += (-difX / magnitude) * 0.1;
+          this.acceleration.y += (-difY / magnitude) * 0.1;
+        }
     }
 
     assignVelocity(x, y) {
         this.velocity.x = x;
         this.velocity.y = y;
+    }
+
+    wander() {
+        // Add small random acceleration to keep bunnies moving
+        if (Math.abs(this.acceleration.x) < 0.01 && Math.abs(this.acceleration.y) < 0.01) {
+          this.acceleration.x += (Math.random() - 0.5) * 0.05;
+          this.acceleration.y += (Math.random() - 0.5) * 0.05;
+        }
     }
 
     render() {
