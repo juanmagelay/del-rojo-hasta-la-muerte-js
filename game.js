@@ -46,7 +46,7 @@ class Game {
     const bunnyTexture = await PIXI.Assets.load("bunny.png");
 
     //Create 10 instances of bunny class
-    for ( let i = 0; i < 10; i++ ) {
+    for ( let i = 0; i < 2; i++ ) {
       const x = Math.random() * this.width;
       const y = Math.random() * this.height;
       
@@ -55,6 +55,10 @@ class Game {
       const bunny = new Bunny( bunnyTexture, x, y, this );
       this.bunnies.push( bunny );
     }
+
+    // Assign targets and persecutors to make bunnies move
+    this.assignTargets();
+    this.assignRandomPersecutorForAllBunnies();
 
     //Add the method this.gameLoop to the ticker.
     //In each frame we are executing the this.gameLoop method.
@@ -92,7 +96,7 @@ class Game {
   }
 
   assignMouseAsTargetForAllBunnies() {
-    for (let bun of this.conejitos) {
+    for (let bun of this.bunnies) {
       bun.assignTarget(this.mouse);
     }
   }
