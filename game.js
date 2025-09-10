@@ -7,6 +7,7 @@ class Game {
   constructor() {
     this.width = 1280;
     this.height = 720;
+    this.mouse = { position: { x: 0, y: 0 } };
     this.initPIXI();    
   }
 
@@ -53,13 +54,22 @@ class Game {
       //Use x, y and a reference to the game instance (this)
       const bunny = new Bunny( bunnyTexture, x, y, this );
       this.bunnies.push( bunny );
-
-      //Add the method this.gameLoop to the ticker.
-      //In each frame we are executing the this.gameLoop method.
-      this.pixiApp.ticker.add(() => {
-          this.gameLoop();
-      });
     }
+
+    //Add the method this.gameLoop to the ticker.
+    //In each frame we are executing the this.gameLoop method.
+    this.pixiApp.ticker.add(this.gameLoop.bind(this));
+    
+    this.addMouseInteractivity();
+  }
+
+  //Functions
+
+  addMouseInteractivity() {
+    // Listen to mouse move event
+    this.pixiApp.canvas.onmousemove = (event) => {
+      this.mouse.position = { x: event.x, y: event.y };
+    };
   }
 
   gameLoop( time ) {
@@ -67,6 +77,35 @@ class Game {
     for (let aBunny of this.bunnies) {
         //Execute the tick method of each bunny.
         aBunny.tick();
+        aBunny.render();
+    }
+  }
+
+  getBunnyRandom() {
+    return this.bunnies[Math.floor(this.bunnies.length * Math.random())];
+  }
+
+  assignTargets() {
+    for (let bun of this.bunnies) {
+      bun.assignTarget(this.getBunnyRandom());
+    }
+  }
+
+  assignMouseAsTargetForAllBunnies() {
+    for (let bun of this.conejitos) {
+      bun.assignTarget(this.mouse);
+    }
+  }
+
+  assignRandomPersecutorForAllBunnies() {
+    for (let bun of this.bunnies) {
+      bun.persecutor = this.getBunnyRandom();
+    }
+  }
+
+  assignMouseAsPersecutorForAllBunnies() {
+    for (let bun of this.bunnies) {
+      bun.persecutor = this.mouse;
     }
   }
 }
