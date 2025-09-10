@@ -1,4 +1,5 @@
 class Bunny {
+  //Test change
   //Define the class properties, but I could not define them.
   sprite;
   id;
