@@ -4,6 +4,7 @@ class Game {
   width;
   height;
 
+  //prueba cambio en main
   constructor() {
     this.width = 1280;
     this.height = 720;
