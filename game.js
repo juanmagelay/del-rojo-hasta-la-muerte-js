@@ -50,11 +50,11 @@ class Game {
     //Load the bunnies
     const bunnyTexture = await PIXI.Assets.load("bunny.png");
 
-    //Create 10 instances of bunny class
+    //Create instances of bunny class
     for ( let i = 0; i < 100; i++ ) {
-      const x = Math.random() * this.width;
-      const y = Math.random() * this.height;
-      
+      const x = this.playArea.x + Math.random() * this.playArea.width;
+      const y = this.playArea.y + Math.random() * this.playArea.height;
+
       //Create an instance of bunny class, and the constructor of this class takes the bunnyTexture as a parameter.
       //Use x, y and a reference to the game instance (this)
       const bunny = new Bunny( bunnyTexture, x, y, this );
