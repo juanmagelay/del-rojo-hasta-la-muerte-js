@@ -4,9 +4,12 @@ class Game {
   width;
   height;
 
-  //prueba cambio en main
-
   constructor() {
+    // Logical spaces inside the fixed background (1280 x 720)
+    this.playArea = { x: 0, y: 0, width: 1004, height: 720 };   // stadium-stands (left)
+    this.grassArea = { x: 1004, y: 0, width: 276, height: 720 }; // stadium-grass (right)
+
+    // Single canvas covers 1280 x 720 (exact background size)
     this.width = 1280;
     this.height = 720;
     this.mouse = { position: { x: 0, y: 0 } };
