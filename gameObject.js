@@ -94,18 +94,26 @@ class GameObject {
         this.velocity.y *= 0.95;
     }
 
+
+    //If the X position of this bunny is > stage width (going out through right side),
+    //or if the X position of this bunny is < 0 (going out through left side)
+    //Multiply by -0.99, the sign is inverted (+ to - and inverse).
+    //And the 0.99 get lose 1% velocity.
     bounce() {
-    //Real example
-        if (this.position.x > this.game.width || this.position.x < 0) {
-            //If the X position of this bunny is > stage width (going out through right side),
-            //or if the X position of this bunny is < 0 (going out through left side)
-            //Multiply by -0.99, the sign is inverted (+ to - and inverse).
-            //And the 0.99 get lose 1% velocity.
+        // Use stadium-stands bounds (playArea)
+        const left = this.game.playArea.x;
+        const right = this.game.playArea.x + this.game.playArea.width;
+        const top = this.game.playArea.y;
+        const bottom = this.game.playArea.y + this.game.playArea.height;
+
+        if (this.position.x > right || this.position.x < left) {
             this.velocity.x *= -0.99;
+            this.position.x = Math.min(Math.max(this.position.x, left), right);
         }
 
-        if (this.position.y > this.game.height || this.position.y < 0) {
+        if (this.position.y > bottom || this.position.y < top) {
             this.velocity.y *= -0.99;
+            this.position.y = Math.min(Math.max(this.position.y, top), bottom);
         }
     }
 
