@@ -1,6 +1,6 @@
 class Game {
   pixiApp;
-  bunnies = [];
+  bunnies = []; // we keep the name for minimal changes
   width;
   height;
 
@@ -25,7 +25,9 @@ class Game {
     const pixiOptions = { 
         background: "#1099bb", 
         width: this.width, 
-        height: this.height 
+        height: this.height,
+        antialias: false,
+        SCALE_MODE: PIXI.SCALE_MODES.NEAREST // pixelated rendering
     };
     
     //Init pixiApp with options declared before.
@@ -34,31 +36,31 @@ class Game {
     await this.pixiApp.init( pixiOptions );
 
     //Add canvas element created by Pixi into the HTML document
-    document.body.appendChild(this.pixiApp.canvas);
+    document.body.appendChild( this.pixiApp.canvas );
 
     //Load the background
-    const bgTexture = await PIXI.Assets.load("stadium.png");
-    const background = new PIXI.Sprite(bgTexture);
+    const bgTexture = await PIXI.Assets.load( "stadium.png" );
+    const background = new PIXI.Sprite( bgTexture );
     background.x = 0;
     background.y = 0;
     background.width = this.width;
     background.height = this.height;
 
     // Load the background first (to be behind NPCs)
-    this.pixiApp.stage.addChild(background);
+    this.pixiApp.stage.addChild( background );
     
-    //Load the bunnies
-    const bunnyTexture = await PIXI.Assets.load("bunny.png");
+    //Load spritesheet JSON
+    const spritesheetData = await PIXI.Assets.load("spritesheets/independiente.json");
 
     //Create instances of bunny class
     for ( let i = 0; i < 100; i++ ) {
       const x = this.playArea.x + Math.random() * this.playArea.width;
       const y = this.playArea.y + Math.random() * this.playArea.height;
 
-      //Create an instance of bunny class, and the constructor of this class takes the bunnyTexture as a parameter.
+      //Create an instance of Game Object with spritesheetData
       //Use x, y and a reference to the game instance (this)
-      const bunny = new Bunny( bunnyTexture, x, y, this );
-      this.bunnies.push( bunny );
+      const independienteGuy = new GameObject(spritesheetData, x, y, this);
+      this.bunnies.push( independienteGuy );
     }
 
     // Assign targets and persecutors to make bunnies move
@@ -66,9 +68,9 @@ class Game {
     this.assignRandomPersecutorForAllBunnies();
     
     // Debug: Log bunny setup
-    console.log(`Created ${this.bunnies.length} bunnies`);
+    console.log(`Created ${this.bunnies.length} game objects`);
     for (let bunny of this.bunnies) {
-      console.log(`Bunny ${bunny.id}: target=${bunny.target ? bunny.target.id || 'mouse' : 'none'}, persecutor=${bunny.persecutor ? bunny.persecutor.id || 'mouse' : 'none'}`);
+      console.log(`Object ${obj.id}: target=${obj.target ? obj.target.id || 'mouse' : 'none'}, persecutor=${obj.persecutor ? obj.persecutor.id || 'mouse' : 'none'}`);
     }
 
     //Add the method this.gameLoop to the ticker.
@@ -89,14 +91,14 @@ class Game {
 
   gameLoop( time ) {
     //Iterate for each of the bunnies.
-    for (let aBunny of this.bunnies) {
+    for (let aObj of this.bunnies) {
         //Execute the tick method of each bunny.
-        aBunny.tick();
-        aBunny.render();
+        aObj.tick();
+        aObj.render();
         
         // Debug: Log bunny movement
         if (Math.floor(time) % 60 === 0) { // Log every second
-          console.log(`Bunny ${aBunny.id}: pos(${Math.round(aBunny.position.x)}, ${Math.round(aBunny.position.y)}) vel(${Math.round(aBunny.velocity.x*100)/100}, ${Math.round(aBunny.velocity.y*100)/100})`);
+          console.log(`Obj ${aObj.id}: pos(${Math.round(aObj.position.x)}, ${Math.round(aObj.position.y)}) vel(${Math.round(aObj.velocity.x*100)/100}, ${Math.round(aObj.velocity.y*100)/100})`);
         }
     }
   }
