@@ -1,6 +1,6 @@
 class Game {
   pixiApp;
-  bunnies = []; // we keep the name for minimal changes
+  characters = []; // we keep the name for minimal changes
   width;
   height;
 
@@ -59,26 +59,26 @@ class Game {
             idle: spritesheet.animations.idle
         }
     };
-    
-    //Create instances of bunny class
+
+    //Create instances of character class
     for ( let i = 0; i < 100; i++ ) {
       const x = this.playArea.x + Math.random() * this.playArea.width;
       const y = this.playArea.y + Math.random() * this.playArea.height;
 
       //Create an instance of Game Object with spritesheetData
       //Use x, y and a reference to the game instance (this)
-      const independienteGuy = new GameObject(spritesheetData, x, y, this);
-      this.bunnies.push( independienteGuy );
+      const character = new GameObject(spritesheetData, x, y, this);
+      this.characters.push( character );
     }
 
-    // Assign targets and persecutors to make bunnies move
+    // Assign targets and persecutors to make characters move
     this.assignTargets();
-    this.assignRandomPersecutorForAllBunnies();
+    this.assignRandomPersecutorForAllCharacters();
     
-    // Debug: Log bunny setup
-    console.log(`Created ${this.bunnies.length} game objects`);
-    for (let bunny of this.bunnies) {
-      console.log(`Object ${bunny.id}: target=${bunny.target ? bunny.target.id || 'mouse' : 'none'}, persecutor=${bunny.persecutor ? bunny.persecutor.id || 'mouse' : 'none'}`);
+    // Debug: Log character setup
+    console.log(`Created ${this.characters.length} game objects`);
+    for (let character of this.characters) {
+      console.log(`Object ${character.id}: target=${character.target ? character.target.id || 'mouse' : 'none'}, persecutor=${character.persecutor ? character.persecutor.id || 'mouse' : 'none'}`);
     }
 
     //Add the method this.gameLoop to the ticker.
@@ -98,44 +98,44 @@ class Game {
   }
 
   gameLoop( time ) {
-    //Iterate for each of the bunnies.
-    for (let aObj of this.bunnies) {
-        //Execute the tick method of each bunny.
-        aObj.tick();
-        aObj.render();
+    //Iterate for each of the characters.
+    for (let aCharacter of this.characters) {
+        //Execute the tick method of each character.
+        aCharacter.tick();
+        aCharacter.render();
         
-        // Debug: Log bunny movement
+        // Debug: Log character movement
         if (Math.floor(time) % 60 === 0) { // Log every second
-          console.log(`Obj ${aObj.id}: pos(${Math.round(aObj.position.x)}, ${Math.round(aObj.position.y)}) vel(${Math.round(aObj.velocity.x*100)/100}, ${Math.round(aObj.velocity.y*100)/100})`);
+          console.log(`Character ${aCharacter.id}: pos(${Math.round(aCharacter.position.x)}, ${Math.round(aCharacter.position.y)}) vel(${Math.round(aCharacter.velocity.x*100)/100}, ${Math.round(aCharacter.velocity.y*100)/100})`);
         }
     }
   }
 
-  getBunnyRandom() {
-    return this.bunnies[Math.floor(this.bunnies.length * Math.random())];
+  getCharacterRandom() {
+    return this.characters[Math.floor(this.characters.length * Math.random())];
   }
 
   assignTargets() {
-    for (let bun of this.bunnies) {
-      bun.assignTarget(this.getBunnyRandom());
+    for (let char of this.characters) {
+      char.assignTarget(this.getCharacterRandom());
     }
   }
 
-  assignMouseAsTargetForAllBunnies() {
-    for (let bun of this.bunnies) {
-      bun.assignTarget(this.mouse);
+  assignMouseAsTargetForAllCharacters() {
+    for (let char of this.characters) {
+      char.assignTarget(this.mouse);
     }
   }
 
-  assignRandomPersecutorForAllBunnies() {
-    for (let bun of this.bunnies) {
-      bun.persecutor = this.getBunnyRandom();
+  assignRandomPersecutorForAllCharacters() {
+    for (let char of this.characters) {
+      char.persecutor = this.getCharacterRandom();
     }
   }
 
-  assignMouseAsPersecutorForAllBunnies() {
-    for (let bun of this.bunnies) {
-      bun.persecutor = this.mouse;
+  assignMouseAsPersecutorForAllCharacters() {
+    for (let char of this.characters) {
+      char.persecutor = this.mouse;
     }
   }
 }

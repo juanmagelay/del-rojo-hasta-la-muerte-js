@@ -97,7 +97,7 @@ class GameObject {
 
         // integrate
         this.velocity.x += this.acceleration.x;
-        this.velocity.y += this.acceleration.y
+        this.velocity.y += this.acceleration.y;
 
         //Velocity variations
         this.bounce(); //rebotar
@@ -136,12 +136,12 @@ class GameObject {
     }
 
 
-    //If the X position of this bunny is > stage width (going out through right side),
-    //or if the X position of this bunny is < 0 (going out through left side)
+    // Constrain movement to stadium-stands (playArea)
+    // Bounce off the boundaries of the play area
     //Multiply by -0.99, the sign is inverted (+ to - and inverse).
     //And the 0.99 get lose 1% velocity.
     bounce() {
-        // Use stadium-stands bounds (playArea)
+        // Constrain to stadium-stands (playArea)
         const left = this.game.playArea.x;
         const right = this.game.playArea.x + this.game.playArea.width;
         const top = this.game.playArea.y;
@@ -204,12 +204,12 @@ class GameObject {
         this.velocity.y = y;
     }
 
-    wander() {
-        // Add small random acceleration to keep bunnies moving
-        if (Math.abs(this.acceleration.x) < 0.01 && Math.abs(this.acceleration.y) < 0.01) {
-          this.acceleration.x += (Math.random() - 0.5) * 0.05;
-          this.acceleration.y += (Math.random() - 0.5) * 0.05;
-        }
+    wander() {     
+      // Add small random acceleration to keep characters moving        
+      if (Math.abs(this.acceleration.x) < 0.01 && Math.abs(this.acceleration.y) < 0.01) {
+        this.acceleration.x += (Math.random() - 0.5) * 0.05;
+        this.acceleration.y += (Math.random() - 0.5) * 0.05;
+      }
     }
 
     render() {
