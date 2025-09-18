@@ -50,8 +50,16 @@ class Game {
     this.pixiApp.stage.addChild( background );
     
     //Load spritesheet JSON
-    const spritesheetData = await PIXI.Assets.load("spritesheets/independiente.json");
-
+    const spritesheet = await PIXI.Assets.load("spritesheets/independiente.json");
+    const spritesheetData = {
+        animations: {
+            walk: spritesheet.animations.walk,
+            back: spritesheet.animations.back,
+            front: spritesheet.animations.front,
+            idle: spritesheet.animations.idle
+        }
+    };
+    
     //Create instances of bunny class
     for ( let i = 0; i < 100; i++ ) {
       const x = this.playArea.x + Math.random() * this.playArea.width;
@@ -70,7 +78,7 @@ class Game {
     // Debug: Log bunny setup
     console.log(`Created ${this.bunnies.length} game objects`);
     for (let bunny of this.bunnies) {
-      console.log(`Object ${obj.id}: target=${obj.target ? obj.target.id || 'mouse' : 'none'}, persecutor=${obj.persecutor ? obj.persecutor.id || 'mouse' : 'none'}`);
+      console.log(`Object ${bunny.id}: target=${bunny.target ? bunny.target.id || 'mouse' : 'none'}, persecutor=${bunny.persecutor ? bunny.persecutor.id || 'mouse' : 'none'}`);
     }
 
     //Add the method this.gameLoop to the ticker.
