@@ -65,17 +65,20 @@ class GameObject {
         }
     }
 
-    // switch animation (keeps previous visible states off)
+    //Switch animation (keeps previous visible states off)
     changeAnimation(name) {
         if (this.currentAnimation === name) return;
+
         if (!this.spritesAnimated[name]) {
-        console.warn("Unknown animation:", name);
-        return;
+          console.warn("Unknown animation:", name);
+          return;
         }
+
         for (let k of Object.keys(this.spritesAnimated)) {
-        this.spritesAnimated[k].visible = false;
-        this.spritesAnimated[k].stop();
+          this.spritesAnimated[k].visible = false;
+          this.spritesAnimated[k].stop();
         }
+
         const chosen = this.spritesAnimated[name];
         chosen.visible = true;
         chosen.play();
@@ -163,37 +166,38 @@ class GameObject {
     }
 
     chase() {
-        if (!this.target) return;
+        if ( !this.target ) return;
         
         // mouse targets come in as { position: {x,y} }
         const targetPos = this.target.position ? this.target.position : this.target;
         const dist = calculateDistance(this.position, targetPos);
-        if (dist > this.vision) return;
+        if ( dist > this.vision ) return;
 
         const difX = targetPos.x - this.position.x;
         const difY = targetPos.y - this.position.y;
 
         // Normalize the direction and apply acceleration
         const magnitude = Math.sqrt(difX * difX + difY * difY);
-        if (magnitude > 0) {
+        
+        if ( magnitude > 0 ) {
           this.acceleration.x += (difX / magnitude) * 0.1;
           this.acceleration.y += (difY / magnitude) * 0.1;
         }
     }
 
     flee() {
-        if (!this.persecutor) return;
+        if ( !this.persecutor ) return;
         
         const pursPos = this.persecutor.position ? this.persecutor.position : this.persecutor;
         const dist = calculateDistance(this.position, pursPos);
-        if (dist > this.vision) return;
+        if ( dist > this.vision ) return;
 
         const difX = pursPos.x - this.position.x;
         const difY = pursPos.y - this.position.y;
 
         // Normalize the direction and apply acceleration (opposite direction)
         const magnitude = Math.sqrt(difX * difX + difY * difY);
-        if (magnitude > 0) {
+        if ( magnitude > 0 ) {
           this.acceleration.x += (-difX / magnitude) * 0.1;
           this.acceleration.y += (-difY / magnitude) * 0.1;
         }
@@ -217,7 +221,7 @@ class GameObject {
         this.container.x = this.position.x;
         this.container.y = this.position.y;
 
-        // z-order if you want vertical sorting (optional)
+        // z-order
         this.container.zIndex = Math.round(this.position.y);
 
         // Decide which animation should play based on velocity and angle
@@ -244,16 +248,16 @@ class GameObject {
     // - moving down (front): angle between 45 and 135
     // - moving up (back): angle between -135 and -45
     // - otherwise: horizontal -> use walk (flip X to mirror)
-    if (a > 45 && a < 135) {
-      if (this.spritesAnimated.front) this.changeAnimation("front");
+    if ( a > 45 && a < 135 ) {
+      if ( this.spritesAnimated.front ) this.changeAnimation("front");
     } else if (a < -45 && a > -135) {
-      if (this.spritesAnimated.back) this.changeAnimation("back");
+      if ( this.spritesAnimated.back ) this.changeAnimation("back");
     } else {
       // horizontal-ish
-      if (this.spritesAnimated.walk) this.changeAnimation("walk");
+      if ( this.spritesAnimated.walk ) this.changeAnimation("walk");
       // flip horizontally if going left
       const spriteForWalk = this.spritesAnimated.walk;
-      if (spriteForWalk) {
+      if ( spriteForWalk ) {
         spriteForWalk.scale.x = (this.velocity.x < 0) ? -Math.abs(spriteForWalk.scale.x) : Math.abs(spriteForWalk.scale.x);
       }
     }
