@@ -38,7 +38,7 @@ class GameObject {
         this.id = Math.floor(Math.random() * 99999999);
 
         // Build an AnimatedSprite for each animation defined in the JSON
-        // spritesheetData.animations is expected to be an object: { idle: [...], walk:[...], ... }
+        // spritesheetData.animations is an object: { idle: [...], walk:[...], ... }
         for (let key of Object.keys(this.spritesheetData.animations)) {
             // PIXI.Assets.load provides ready textures arrays for animations in many setups,
             // so we pass the array directly to AnimatedSprite (this matches Pixi usage).
