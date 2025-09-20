@@ -76,13 +76,10 @@ class GameObject {
 
         for (let k of Object.keys(this.spritesAnimated)) {
           this.spritesAnimated[k].visible = false;
-          this.spritesAnimated[k].stop();
         }
 
-        const chosen = this.spritesAnimated[name];
-        chosen.visible = true;
-        chosen.play();
-        this.currentAnimation = name;
+      this.spritesAnimated[name].visible = true;
+      this.currentAnimation = name;
     }
 
     //Tick
@@ -98,18 +95,18 @@ class GameObject {
         this.wander(); // wander randomly if no strong behavior
         this.limitAcceleration();
 
-        // integrate
-        this.velocity.x += this.acceleration.x;
-        this.velocity.y += this.acceleration.y;
+        // integrate with deltaTime
+        this.velocity.x += this.acceleration.x * this.game.pixiApp.ticker.deltaTime;
+        this.velocity.y += this.acceleration.y * this.game.pixiApp.ticker.deltaTime;
 
         //Velocity variations
         this.bounce(); //rebotar
         this.applyFriction();
         this.limitVelocity();
 
-        //Pixels per frame
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        //Pixels per frame with deltaTime
+        this.position.x += this.velocity.x * this.game.pixiApp.ticker.deltaTime;
+        this.position.y += this.velocity.y * this.game.pixiApp.ticker.deltaTime;
 
         //Save the angle
         this.angle = radiansToDegrees(
@@ -134,9 +131,10 @@ class GameObject {
     }
 
     applyFriction() {
-        this.velocity.x *= 0.95;
-        this.velocity.y *= 0.95;
-    }
+      const friction = Math.pow(0.95, this.game.pixiApp.ticker.deltaTime);
+      this.velocity.x *= friction;
+      this.velocity.y *= friction;
+    } 
 
 
     // Constrain movement to stadium-stands (playArea)
@@ -264,15 +262,11 @@ class GameObject {
   }
 
   _updateAnimationSpeed() {
-    // Linearly increase animation speed with velocity (tweak constants to taste)
-    const base = 0.08;
-    const factor = 0.06;
-    const speed = this.velocityMagnitude || 0;
-    const newSpeed = base + speed * factor;
-
-    for (let k of Object.keys(this.spritesAnimated)) {
-      this.spritesAnimated[k].animationSpeed = newSpeed;
-    }
+      // Velocity of animation proportional to real velocity + deltaTime
+      for (let k of Object.keys(this.spritesAnimated)) {
+          this.spritesAnimated[k].animationSpeed = 
+              this.velocityMagnitude * 0.05 * this.game.pixiApp.ticker.deltaTime;
+      }
   }
 
 }
