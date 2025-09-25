@@ -50,15 +50,22 @@ class Game {
     this.pixiApp.stage.addChild( background );
     
     //Load spritesheet JSON
-    const spritesheet = await PIXI.Assets.load("spritesheets/independiente.json");
-    const spritesheetData = {
+    const enemySheet = await PIXI.Assets.load("spritesheets/independiente.json");
+    const heroSheet  = await PIXI.Assets.load("spritesheets/boca.json");
+
+    //Load each animation as an array of textures
+    const makeSpritesheetData = (sheet) => ({
         animations: {
-            walk: spritesheet.animations.walk,
-            back: spritesheet.animations.back,
-            front: spritesheet.animations.front,
-            idle: spritesheet.animations.idle
+            walk: sheet.animations.walk,
+            back: sheet.animations.back,
+            front: sheet.animations.front,
+            idle: sheet.animations.idle
         }
-    };
+    });
+
+    const enemySheetData = makeSpritesheetData(enemySheet);
+    const heroSheetData = makeSpritesheetData(heroSheet);
+
 
     //Create instances of character class
     for ( let i = 0; i < 100; i++ ) {
@@ -67,7 +74,7 @@ class Game {
 
       //Create an instance of Game Object with spritesheetData
       //Use x, y and a reference to the game instance (this)
-      const character = new GameObject(spritesheetData, x, y, this);
+      const character = new GameObject(enemySheetData, x, y, this);
       this.characters.push( character );
     }
 
