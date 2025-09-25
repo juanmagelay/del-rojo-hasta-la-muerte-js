@@ -84,9 +84,6 @@ class Game {
     
     // Debug: Log character setup
     console.log(`Created ${this.characters.length} game objects`);
-    for (let character of this.characters) {
-      console.log(`Object ${character.id}: target=${character.target ? character.target.id || 'mouse' : 'none'}, persecutor=${character.persecutor ? character.persecutor.id || 'mouse' : 'none'}`);
-    }
 
     //Add the method this.gameLoop to the ticker.
     //In each frame we are executing the this.gameLoop method.
@@ -128,21 +125,9 @@ class Game {
     }
   }
 
-  assignMouseAsTargetForAllCharacters() {
-    for (let char of this.characters) {
-      char.assignTarget(this.mouse);
-    }
-  }
-
   assignRandomPersecutorForAllCharacters() {
     for (let char of this.characters) {
       char.persecutor = this.getCharacterRandom();
-    }
-  }
-
-  assignMouseAsPersecutorForAllCharacters() {
-    for (let char of this.characters) {
-      char.persecutor = this.mouse;
     }
   }
 }
