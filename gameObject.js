@@ -89,10 +89,9 @@ class GameObject {
         //Acceleration
         this.acceleration.x = 0;
         this.acceleration.y = 0;
-
-        this.flee(); //escapar
-        this.chase(); //perseguir
-        this.wander(); // wander randomly if no strong behavior
+        
+        // Decide acceleration via subclass brain (IA or input)
+        this.applyBrain();
         this.limitAcceleration();
 
         // integrate with deltaTime
@@ -118,6 +117,9 @@ class GameObject {
             this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y
         );
     }
+
+    // Hook for subclasses (Enemy/Hero) to set acceleration each frame
+    applyBrain() {}
 
     
     //Functions

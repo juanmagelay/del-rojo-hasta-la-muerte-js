@@ -67,29 +67,26 @@ class Game {
     const enemySheetData = makeSpritesheetData(enemySheet);
     const heroSheetData = makeSpritesheetData(heroSheet);
 
-    //Create instances of character class
-    for ( let i = 0; i < 100; i++ ) {
+    // Create hero
+    const hx = this.playArea.x + this.playArea.width * 0.5;
+    const hy = this.playArea.y + this.playArea.height * 0.5;
+    const hero = new Hero(heroSheetData, hx, hy, this);
+    this.characters.push(hero);
+
+    // Create enemies
+    for ( let i = 0; i < 80; i++ ) {
       const x = this.playArea.x + Math.random() * this.playArea.width;
       const y = this.playArea.y + Math.random() * this.playArea.height;
-
-      //Create an instance of Game Object with spritesheetData
-      //Use x, y and a reference to the game instance (this)
-      const character = new GameObject(enemySheetData, x, y, this);
-      this.characters.push( character );
+      const enemy = new Enemy(enemySheetData, x, y, this);
+      enemy.target = hero;
+      this.characters.push(enemy);
     }
-
-    // Assign targets and persecutors to make characters move
-    this.assignTargets();
-    this.assignRandomPersecutorForAllCharacters();
-    
-    // Debug: Log character setup
-    console.log(`Created ${this.characters.length} game objects`);
 
     //Add the method this.gameLoop to the ticker.
     //In each frame we are executing the this.gameLoop method.
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
     
-    this.addMouseInteractivity();
+    // Hero attaches its own input listeners; mouse move listener optional
   }
 
   //Functions
