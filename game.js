@@ -63,9 +63,9 @@ class Game {
         }
     });
 
+    //Prepare spritesheet
     const enemySheetData = makeSpritesheetData(enemySheet);
     const heroSheetData = makeSpritesheetData(heroSheet);
-
 
     //Create instances of character class
     for ( let i = 0; i < 100; i++ ) {
