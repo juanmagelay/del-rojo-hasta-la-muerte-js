@@ -111,20 +111,4 @@ class Game {
         }
     }
   }
-
-  getCharacterRandom() {
-    return this.characters[Math.floor(this.characters.length * Math.random())];
-  }
-
-  assignTargets() {
-    for (let char of this.characters) {
-      char.assignTarget(this.getCharacterRandom());
-    }
-  }
-
-  assignRandomPersecutorForAllCharacters() {
-    for (let char of this.characters) {
-      char.persecutor = this.getCharacterRandom();
-    }
-  }
 }
