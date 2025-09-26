@@ -6,12 +6,14 @@ class GameObject {
     acceleration = { x: 0, y: 0 };
     maxAcceleration = 0.2;
     maxVelocity = 3;
+    velocityMagnitude;
 
     //Animation & display
     container;                 // PIXI.Container that holds the animated sprites
     spritesAnimated = {};      // { walk: AnimatedSprite, back: ..., front: ..., idle: ... }
     currentAnimation = null;
     spritesheetData = null;
+    angle;
     
     //Constructor
     constructor ( spritesheetData, x, y, game ) {
@@ -78,10 +80,8 @@ class GameObject {
       this.currentAnimation = name;
     }
 
-    //Tick
+    //Tick: This method tick is executed in every frame.
     tick() {
-        //This method tick is executed in every frame.
-        
         //Acceleration
         this.acceleration.x = 0;
         this.acceleration.y = 0;
@@ -90,7 +90,7 @@ class GameObject {
         this.applyBrain();
         this.limitAcceleration();
 
-        // integrate with deltaTime
+        //Integrate with deltaTime
         this.velocity.x += this.acceleration.x * this.game.pixiApp.ticker.deltaTime;
         this.velocity.y += this.acceleration.y * this.game.pixiApp.ticker.deltaTime;
 
@@ -103,7 +103,7 @@ class GameObject {
         this.position.x += this.velocity.x * this.game.pixiApp.ticker.deltaTime;
         this.position.y += this.velocity.y * this.game.pixiApp.ticker.deltaTime;
 
-        //Save the angle
+        //Save the angle to show the correct animation
         this.angle = radiansToDegrees(
             Math.atan2(this.velocity.y, this.velocity.x) //This is backguards y, x
         );
@@ -140,76 +140,75 @@ class GameObject {
     //Multiply by -0.99, the sign is inverted (+ to - and inverse).
     //And the 0.99 get lose 1% velocity.
     bounce() {
-        // Constrain to stadium-stands (playArea)
-        const left = this.game.playArea.x;
-        const right = this.game.playArea.x + this.game.playArea.width;
-        const top = this.game.playArea.y;
-        const bottom = this.game.playArea.y + this.game.playArea.height;
+      // Constrain to stadium-stands (playArea)
+      const left = this.game.playArea.x;
+      const right = this.game.playArea.x + this.game.playArea.width;
+      const top = this.game.playArea.y;
+      const bottom = this.game.playArea.y + this.game.playArea.height;
 
-        if (this.position.x > right || this.position.x < left) {
-            this.velocity.x *= -0.99;
-            this.position.x = Math.min(Math.max(this.position.x, left), right);
-        }
+      if (this.position.x > right || this.position.x < left) {
+          this.velocity.x *= -0.99;
+          this.position.x = Math.min(Math.max(this.position.x, left), right);
+      }
 
-        if (this.position.y > bottom || this.position.y < top) {
-            this.velocity.y *= -0.99;
-            this.position.y = Math.min(Math.max(this.position.y, top), bottom);
-        }
+      if (this.position.y > bottom || this.position.y < top) {
+          this.velocity.y *= -0.99;
+          this.position.y = Math.min(Math.max(this.position.y, top), bottom);
+      }
     }
 
     render() {
-        // move container to current position
-        this.container.x = this.position.x;
-        this.container.y = this.position.y;
+      // move container to current position
+      this.container.x = this.position.x;
+      this.container.y = this.position.y;
 
-        // z-order
-        this.container.zIndex = Math.round(this.position.y);
+      // z-order
+      this.container.zIndex = Math.round(this.position.y);
 
-        // Decide which animation should play based on velocity and angle
-        this._updateAnimationBasedOnMovement();
+      // Decide which animation should play based on velocity and angle
+      this._updateAnimationBasedOnMovement();
 
-        // Update animation speed to reflect velocity
-        this._updateAnimationSpeed();
+      // Update animation speed to reflect velocity
+      this._updateAnimationSpeed();
     }
 
     _updateAnimationBasedOnMovement() {
-    const speed = this.velocityMagnitude || 0;
-    const threshold = 0.2; // below this, we consider the object idle
+      const speed = this.velocityMagnitude || 0;
+      const threshold = 0.2; // below this, we consider the object idle
 
-    if (speed < threshold) {
-      // idle
-      if (this.spritesAnimated.idle) this.changeAnimation("idle");
-      return;
-    }
-
-    // angle is degrees from Math.atan2(y, x)
-    const a = this.angle;
-
-    // Down on screen is positive Y (canvas coords), so:
-    // - moving down (front): angle between 45 and 135
-    // - moving up (back): angle between -135 and -45
-    // - otherwise: horizontal -> use walk (flip X to mirror)
-    if ( a > 45 && a < 135 ) {
-      if ( this.spritesAnimated.front ) this.changeAnimation("front");
-    } else if (a < -45 && a > -135) {
-      if ( this.spritesAnimated.back ) this.changeAnimation("back");
-    } else {
-      // horizontal-ish
-      if ( this.spritesAnimated.walk ) this.changeAnimation("walk");
-      // flip horizontally if going left
-      const spriteForWalk = this.spritesAnimated.walk;
-      if ( spriteForWalk ) {
-        spriteForWalk.scale.x = (this.velocity.x < 0) ? -Math.abs(spriteForWalk.scale.x) : Math.abs(spriteForWalk.scale.x);
+      if (speed < threshold) {
+        // idle
+        if (this.spritesAnimated.idle) this.changeAnimation("idle");
+        return;
       }
-    }
-  }
 
-  _updateAnimationSpeed() {
+      // angle is degrees from Math.atan2(y, x)
+      const a = this.angle;
+
+      // Down on screen is positive Y (canvas coords), so:
+      // - moving down (front): angle between 45 and 135
+      // - moving up (back): angle between -135 and -45
+      // - otherwise: horizontal -> use walk (flip X to mirror)
+      if ( a > 45 && a < 135 ) {
+        if ( this.spritesAnimated.front ) this.changeAnimation("front");
+      } else if (a < -45 && a > -135) {
+        if ( this.spritesAnimated.back ) this.changeAnimation("back");
+      } else {
+        // horizontal-ish
+        if ( this.spritesAnimated.walk ) this.changeAnimation("walk");
+        // flip horizontally if going left
+        const spriteForWalk = this.spritesAnimated.walk;
+        if ( spriteForWalk ) {
+          spriteForWalk.scale.x = (this.velocity.x < 0) ? -Math.abs(spriteForWalk.scale.x) : Math.abs(spriteForWalk.scale.x);
+        }
+      }
+    }  
+
+    _updateAnimationSpeed() {
       // Velocity of animation proportional to real velocity + deltaTime
       for (let k of Object.keys(this.spritesAnimated)) {
-          this.spritesAnimated[k].animationSpeed = 
-              this.velocityMagnitude * 0.05 * this.game.pixiApp.ticker.deltaTime;
+        this.spritesAnimated[k].animationSpeed = 
+          this.velocityMagnitude * 0.05 * this.game.pixiApp.ticker.deltaTime;
       }
-  }
-
+    }
 }

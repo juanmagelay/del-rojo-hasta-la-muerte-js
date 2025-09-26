@@ -1,8 +1,13 @@
 class Hero extends GameObject {
+    //Properties
+    input;
+    moveAcceleration;
+    maxVelocity;
+    
     constructor(spritesheetData, x, y, game) {
         super(spritesheetData, x, y, game);
         this.input = { up: false, down: false, left: false, right: false };
-        this.moveAcceleration = 0.2;
+        this.moveAcceleration = 0.2; // Acceleration per input
         this.maxVelocity = 4;
         this._attachInput();
     }
