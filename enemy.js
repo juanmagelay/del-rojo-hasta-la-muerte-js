@@ -6,7 +6,7 @@ class Enemy extends GameObject {
       super( spritesheetData, x, y, game );
 
       // Target
-          this.target = null;
+      this.target = null;
 
       // Boids tuning (radii in px, weights are multipliers)
       this.boids = {
@@ -22,18 +22,17 @@ class Enemy extends GameObject {
     }
 
     applyBrain() {
-		// If very close to hero, stop and skip other behaviors
-		if (this.target) {
-			const targetPos = this.target.position ? this.target.position : this.target;
-			const dStop = calculateDistance(this.position, targetPos);
-			if (dStop <= this.boids.stopRadius) {
-				this.velocity.x = 0; this.velocity.y = 0;
-				this.acceleration.x = 0; this.acceleration.y = 0;
-				return;
-			}
-		}
-
-		
+      // If very close to hero, stop and skip other behaviors
+      if (this.target) {
+        const targetPos = this.target.position ? this.target.position : this.target;
+        const dStop = calculateDistance(this.position, targetPos);
+        if (dStop <= this.boids.stopRadius) {
+          this.velocity.x = 0; this.velocity.y = 0;
+          this.acceleration.x = 0; this.acceleration.y = 0;
+          return;
+        }
+      }
+      
       // Boids: separation, alignment, cohesion (enemies flocking)
       const neighbors = this._getNeighbors(Math.max(this.boids.separationRadius, this.boids.alignmentRadius, this.boids.cohesionRadius));
       if (neighbors.length > 0) {
@@ -47,7 +46,7 @@ class Enemy extends GameObject {
 
       // Light wander if there are no significant forces
       this.wander();
-      }
+    }
 
     //Functions
 
@@ -80,6 +79,7 @@ class Enemy extends GameObject {
     }
 
     // --- Boids helpers ---
+    
     _getNeighbors( maxRadius ) {
       const result = [];
       for (let c of this.game.characters) {
