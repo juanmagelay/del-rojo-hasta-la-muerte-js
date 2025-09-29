@@ -36,7 +36,9 @@ class Hero extends GameObject {
     }
 
     _onKeyX() {
-        // acción con tecla X del héroe (placeholder)
+        if (!this.game || !this.game.placeToilet) return;
+        // Place a toilet at hero's current world position
+        this.game.placeToilet({ x: this.position.x, y: this.position.y });
     }
 
     applyBrain() {
