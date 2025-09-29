@@ -201,12 +201,13 @@ class Game {
 
     // Red digits centered, slightly scaled for pixel look
     this.timerText = new PIXI.Text("1:00", {
-      fontFamily: "monospace",
-      fontSize: 18,
+      fontFamily: "VT323",
+      fontSize: 24,
       fill: 0xFF0000,
       align: "center",
       letterSpacing: 2
     });
+
     this.timerText.anchor.set(0.5, 0.5);
     this.timerText.x = Math.round(panelWidth / 2);
     this.timerText.y = Math.round(panelHeight / 2);
@@ -242,7 +243,7 @@ class Game {
 
   _createHealthBar() {
     const width = 240;
-    const height = 24;
+    const height = 40;
     const margin = 10;
     const container = new PIXI.Container();
     container.x = margin;
@@ -266,7 +267,7 @@ class Game {
   _updateHealthBar() {
     if (!this.healthBarFill) return;
     const width = 240 - 4; // inner width
-    const height = 24 - 4; // inner height
+    const height = 40 - 4; // inner height
     const ratio = Math.max(0, Math.min(1, this.health / this.maxHealth));
     this.healthBarFill.clear();
     this.healthBarFill.roundRect(2, 2, Math.max(1, Math.round(width * ratio)), height, 2);
@@ -275,45 +276,53 @@ class Game {
 
   async _createToiletCounter() {
     const panelWidth = 120;
-    const panelHeight = 44;
+    const panelHeight = 40;
     const marginTop = 10;
     const container = new PIXI.Container();
     container.x = this.width - panelWidth - 10;
     container.y = marginTop;
 
+    //Toilet background panel
     const panel = new PIXI.Graphics();
     panel.roundRect(0, 0, panelWidth, panelHeight, 6);
     panel.fill({ color: 0x000000 });
     panel.stroke({ color: 0xCCCCCC, width: 2 });
     container.addChild(panel);
 
+    //Container for icon + text 
+    const row = new PIXI.Container();
+    row.y = panelHeight / 2; // center vertically
+    container.addChild(row);
+
     // Try to load inodoro.png, fall back to a placeholder
     try {
       const tex = await PIXI.Assets.load("inodoro.png");
       this.toiletIconSprite = new PIXI.Sprite(tex);
-      this.toiletIconSprite.x = 8;
-      this.toiletIconSprite.y = 6;
       this.toiletIconSprite.scale.set(0.25);
-      container.addChild(this.toiletIconSprite);
+      this.toiletIconSprite.anchor.set(0, 0.5); //Left, vertical centered
+      row.addChild(this.toiletIconSprite);
     } catch (e) {
       const placeholder = new PIXI.Graphics();
-      placeholder.roundRect(8, 6, 32, 32, 4);
+      placeholder.roundRect(0, 0, 32, 32, 4);
       placeholder.fill({ color: 0x444444 });
-      container.addChild(placeholder);
+      placeholder.pivot.y = 16; //Vertical centered
+      row.addChild(placeholder);
     }
 
+    //Text
     this.toiletCountText = new PIXI.Text(`x ${this.toiletCount}`, {
-      fontFamily: "monospace",
+      fontFamily: "VT323",
       fontSize: 18,
-      fill: 0xFF0000,
+      fill: 0xFFFFFF,
       align: "left",
       letterSpacing: 1
     });
     this.toiletCountText.scale.set(2);
-    this.toiletCountText.x = 48;
-    this.toiletCountText.y = 10;
-    container.addChild(this.toiletCountText);
+    this.toiletCountText.anchor.set(0, 0.5); //Left, vertical centered
+    this.toiletCountText.x = 40; //Separation from icon
+    row.addChild(this.toiletCountText);
 
+    //Add to UI Layer
     this.uiLayer.addChild(container);
   }
 
