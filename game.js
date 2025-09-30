@@ -22,12 +22,12 @@ class Game {
 
   constructor() {
     // Logical spaces inside the fixed background (1280 x 720)
-    this.playArea = { x: 0, y: 0, width: 1004, height: 720 };   // stadium-stands (left)
-    this.grassArea = { x: 1004, y: 0, width: 276, height: 720 }; // stadium-grass (right)
+    this.playArea = { x: 0, y: 0, width: 1336, height: 1024 };   // stadium-stands (left)
+    this.grassArea = { x: 1336, y: 0, width: 200, height: 1024 }; // stadium-grass (right)
 
     // Single canvas covers 1280 x 720 (exact background size)
-    this.width = 1280;
-    this.height = 720;
+    this.width = 1536;
+    this.height = 1024;
     this.mouse = { position: { x: 0, y: 0 } };
     this.initPIXI();    
   }
@@ -55,7 +55,7 @@ class Game {
     document.body.appendChild( this.pixiApp.canvas );
 
     //Load the background
-    const bgTexture = await PIXI.Assets.load( "stadium.png" );
+    const bgTexture = await PIXI.Assets.load( "stadium2.png" );
     const background = new PIXI.Sprite( bgTexture );
     background.x = 0;
     background.y = 0;
