@@ -2,6 +2,7 @@ class Enemy extends GameObject {
     target;
 	  boids;
     
+    active = false;
     constructor ( spritesheetData, x, y, game ) {
       super( spritesheetData, x, y, game );
 
@@ -22,9 +23,9 @@ class Enemy extends GameObject {
     }
 
     applyBrain() {
+      if (!this.active) return;
       // Buscar inodoro cercano primero
       const nearbyToilet = this._findNearestToilet();
-      
       if (nearbyToilet) {
         // Si hay inodoro cerca, atacarlo
         this.target = nearbyToilet;
@@ -33,7 +34,6 @@ class Enemy extends GameObject {
         const hero = this.game.characters.find(c => c instanceof Hero);
         this.target = hero || null;
       }
-      
       // Si muy cerca del objetivo, detenerse
       if (this.target) {
         const targetPos = this.target.position ? this.target.position : this.target;
@@ -46,20 +46,17 @@ class Enemy extends GameObject {
           return;
         }
       }
-      
       // Boids: separation, alignment, cohesion
       const neighbors = this._getNeighbors(Math.max(
         this.boids.separationRadius, 
         this.boids.alignmentRadius, 
         this.boids.cohesionRadius
       ));
-      
       if (neighbors.length > 0) {
         this._separate(neighbors);
         this._align(neighbors);
         this._cohesion(neighbors);
       }
-
       this.chase();
       this.wander();
     }

@@ -346,7 +346,7 @@ class Game {
 
     // Red digits centered, slightly scaled for pixel look
     this.timerText = new PIXI.Text("1:00", {
-      fontFamily: "VT323",
+      fontFamily: "VT323, Arial, sans-serif",
       fontSize: 24,
       fill: 0xFF0000,
       align: "center",
@@ -456,7 +456,7 @@ class Game {
 
     //Text
     this.toiletCountText = new PIXI.Text(`x ${this.toiletCount}`, {
-      fontFamily: "VT323",
+      fontFamily: "VT323, Arial, sans-serif",
       fontSize: 18,
       fill: 0xFFFFFF,
       align: "left",

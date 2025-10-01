@@ -4,6 +4,7 @@ class Hero extends GameObject {
     moveAcceleration;
     maxVelocity;
     
+    inputEnabled = false;
     constructor(spritesheetData, x, y, game) {
         super(spritesheetData, x, y, game);
         this.input = { up: false, down: false, left: false, right: false };
@@ -14,6 +15,7 @@ class Hero extends GameObject {
 
     _attachInput() {
         window.addEventListener('keydown', (e) => {
+            if (!this.inputEnabled) return;
             if (e.key === 'w' || e.key === 'ArrowUp') this.input.up = true;
             if (e.key === 's' || e.key === 'ArrowDown') this.input.down = true;
             if (e.key === 'a' || e.key === 'ArrowLeft') this.input.left = true;
@@ -21,6 +23,7 @@ class Hero extends GameObject {
             if (e.key.toLowerCase() === 'x') this._onKeyX();
         });
         window.addEventListener('keyup', (e) => {
+            if (!this.inputEnabled) return;
             if (e.key === 'w' || e.key === 'ArrowUp') this.input.up = false;
             if (e.key === 's' || e.key === 'ArrowDown') this.input.down = false;
             if (e.key === 'a' || e.key === 'ArrowLeft') this.input.left = false;

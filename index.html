@@ -3,7 +3,10 @@
   <head>
     
     <style>
-        body { margin: 0px; }
+        body {
+          margin: 0px;
+          font-family: 'VT323', Arial, sans-serif;
+        }
     </style>
     
     <!-- Import Utils -->
@@ -17,16 +20,74 @@
     <!-- Import PixiJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.0/pixi.min.js"></script>
 
-    <!-- Import game and classes (order matters for globals) -->
-    <script src="gameObject.js"></script>
-    <script src="enemy.js"></script>
-    <script src="hero.js"></script>
-    <script src="game.js"></script>
+  <!-- Import game and classes (order matters for globals) -->
+  <script src="gameObject.js"></script>
+  <script src="enemy.js"></script>
+  <script src="hero.js"></script>
+  <script src="game.js"></script>
+  <script src="gameMenuOverlay.js"></script>
 
   </head>
   <body>
       <script>
-        const game = new Game();
+        // Modifica Game para soportar overlay de inicio y fin
+        class GameWithOverlay extends Game {
+          constructor() {
+            super();
+            this.overlay = new GameMenuOverlay(this);
+            this._gameActive = false;
+          }
+          startGame() {
+            this._gameActive = true;
+            this._enableHeroInput(true);
+            this._enableEnemies(true);
+            this.health = this.maxHealth;
+            this.toiletCount = 10;
+            this._updateHealthBar();
+            this._updateToiletCounter();
+          }
+          restartGame() {
+            // Quita todos los inodoros
+            for (const t of this.toilets) {
+              if (t.sprite && t.sprite.destroy) t.sprite.destroy();
+            }
+            this.toilets = [];
+            this.health = this.maxHealth;
+            this.toiletCount = 10;
+            this.remainingSeconds = 60;
+            this._timerAccumulatorMs = 0;
+            this._updateHealthBar();
+            this._updateToiletCounter();
+            this._enableHeroInput(true);
+            this._enableEnemies(true);
+            this.overlay.showStart();
+          }
+          _enableHeroInput(enable) {
+            const hero = this._getHero();
+            if (hero) hero.inputEnabled = enable;
+          }
+          _enableEnemies(enable) {
+            for (const c of this.characters) {
+              if (c instanceof Enemy) c.active = enable;
+            }
+          }
+          gameLoop(time) {
+            if (!this._gameActive) return;
+            super.gameLoop(time);
+            if (this.health <= 0) {
+              this._gameActive = false;
+              this._enableHeroInput(false);
+              this._enableEnemies(false);
+              this.overlay.showGameOver();
+            } else if (this.remainingSeconds <= 0) {
+              this._gameActive = false;
+              this._enableHeroInput(false);
+              this._enableEnemies(false);
+              this.overlay.showWin();
+            }
+          }
+        }
+        const game = new GameWithOverlay();
       </script>
   </body>
 </html>
