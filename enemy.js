@@ -22,51 +22,71 @@ class Enemy extends GameObject {
     }
 
     applyBrain() {
-      // If very close to hero, stop and skip other behaviors
+      // Buscar inodoro cercano primero
+      const nearbyToilet = this._findNearestToilet();
+      
+      if (nearbyToilet) {
+        // Si hay inodoro cerca, atacarlo
+        this.target = nearbyToilet;
+      } else {
+        // Si no, perseguir al hero
+        const hero = this.game.characters.find(c => c instanceof Hero);
+        this.target = hero || null;
+      }
+      
+      // Si muy cerca del objetivo, detenerse
       if (this.target) {
         const targetPos = this.target.position ? this.target.position : this.target;
         const dStop = calculateDistance(this.position, targetPos);
         if (dStop <= this.boids.stopRadius) {
-          this.velocity.x = 0; this.velocity.y = 0;
-          this.acceleration.x = 0; this.acceleration.y = 0;
+          this.velocity.x = 0;
+          this.velocity.y = 0;
+          this.acceleration.x = 0;
+          this.acceleration.y = 0;
           return;
         }
       }
       
-      // Boids: separation, alignment, cohesion (enemies flocking)
-      const neighbors = this._getNeighbors(Math.max(this.boids.separationRadius, this.boids.alignmentRadius, this.boids.cohesionRadius));
+      // Boids: separation, alignment, cohesion
+      const neighbors = this._getNeighbors(Math.max(
+        this.boids.separationRadius, 
+        this.boids.alignmentRadius, 
+        this.boids.cohesionRadius
+      ));
+      
       if (neighbors.length > 0) {
         this._separate(neighbors);
         this._align(neighbors);
         this._cohesion(neighbors);
       }
 
-      // Hero chase in a little radious
       this.chase();
-
-      // Light wander if there are no significant forces
       this.wander();
     }
 
     //Functions
 
     chase() {
-        if ( !this.target ) return;
-        
-        const targetPos = this.target.position ? this.target.position : this.target;
-		    const dist = calculateDistance(this.position, targetPos);
-		    if ( dist > this.boids.heroChaseRadius ) return;
+      if (!this.target) return;
+      
+      const targetPos = this.target.position ? this.target.position : this.target;
+      const dist = calculateDistance(this.position, targetPos);
+      
+      // Mayor radio para inodoros
+      const chaseRadius = this.target.isToilet ? 220 : this.boids.heroChaseRadius;
+      
+      if (dist > chaseRadius) return;
 
-        const difX = targetPos.x - this.position.x;
-        const difY = targetPos.y - this.position.y;
-
-        // Normalize the direction and apply acceleration
-        const magnitude = Math.sqrt(difX * difX + difY * difY);
-        
-        if ( magnitude > 0 ) {
-          this.acceleration.x += (difX / magnitude) * 0.1;
-          this.acceleration.y += (difY / magnitude) * 0.1;
-        }
+      const difX = targetPos.x - this.position.x;
+      const difY = targetPos.y - this.position.y;
+      const magnitude = Math.sqrt(difX * difX + difY * difY);
+      
+      if (magnitude > 0) {
+        // Más agresivo con inodoros
+        const intensity = this.target.isToilet ? 0.15 : 0.1;
+        this.acceleration.x += (difX / magnitude) * intensity;
+        this.acceleration.y += (difY / magnitude) * intensity;
+      }
     }
 
     wander() {     
@@ -163,5 +183,23 @@ class Enemy extends GameObject {
         this.acceleration.y += desired.y * this.boids.cohesionWeight;
       }
     }
+  }
+
+  _findNearestToilet() {
+    const activeToilets = this.game.toilets.filter(t => !t.destroyed);
+    if (activeToilets.length === 0) return null;
+    
+    let nearest = null;
+    let minDist = 220; // Radio de detección
+    
+    for (let toilet of activeToilets) {
+      const dist = calculateDistance(this.position, toilet.position);
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = toilet;
+      }
+    }
+    
+    return nearest;
   }
 }

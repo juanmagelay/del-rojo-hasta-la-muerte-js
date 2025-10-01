@@ -61,6 +61,11 @@ class GameObject {
             const first = Object.keys(this.spritesAnimated)[0];
             if (first) this.changeAnimation(first);
         }
+        
+        //Collision
+        this.collisionRadius = 16;
+        this.isSolid = true;
+        this.canPushOthers = true;
     }
 
     //Switch animation (keeps previous visible states off)
@@ -114,6 +119,9 @@ class GameObject {
 
         //Bounds
         this._applyBounds();
+
+        //Collision
+        this._handleCollisions();
     }
 
     // Hook for subclasses (Enemy/Hero) to set acceleration each frame
@@ -217,6 +225,120 @@ class GameObject {
     if (this.position.y > bounds.y + bounds.height) {
       this.position.y = bounds.y + bounds.height;
       if (this.velocity) this.velocity.y = 0;
+    }
+  }
+
+    _handleCollisions() {
+    if (!this.isSolid) return;
+    // Colisiones con personajes
+    for (let other of this.game.characters) {
+      if (other === this) continue;
+      if (!other.isSolid) continue;
+      const collision = checkCircleCollision(
+        this.position, 
+        other.position, 
+        this.collisionRadius, 
+        other.collisionRadius
+      );
+      if (collision) {
+        // 1. Enemy colisiona con Hero: solo daño, NO lo mueve
+        if (this instanceof Enemy && other instanceof Hero) {
+          if (this.game && typeof this.game._applyHeroDamage === 'function') {
+            const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
+            this.game._applyHeroDamage(6 * deltaSeconds);
+          }
+          // NO separar ni modificar velocidad del Hero
+          continue;
+        }
+        // 2. Hero colisiona con Enemy: solo lo mueve si está presionando una flecha
+        if (this instanceof Hero && other instanceof Enemy) {
+          if (this.game && typeof this.game._applyHeroDamage === 'function') {
+            const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
+            this.game._applyHeroDamage(6 * deltaSeconds);
+          }
+          // Solo arrastra si está presionando una flecha
+          if (this.input && (this.input.up || this.input.down || this.input.left || this.input.right)) {
+            separateObjects(
+              this.position, 
+              other.position, 
+              this.collisionRadius, 
+              other.collisionRadius
+            );
+            this._resolveCollisionVelocity(other);
+          }
+          continue;
+        }
+        // Separar y resolver velocidad normalmente para otros casos
+        separateObjects(
+          this.position, 
+          other.position, 
+          this.collisionRadius, 
+          other.collisionRadius
+        );
+        this._resolveCollisionVelocity(other);
+      }
+    }
+  
+  // Colisiones con inodoros
+  const activeToilets = this.game.toilets.filter(t => !t.destroyed);
+  for (let toilet of activeToilets) {
+    // Asegura que el inodoro tenga radio de colisión
+    const toiletRadius = toilet.collisionRadius || 20;
+    const collision = checkCircleCollision(
+      this.position, 
+      toilet.position, 
+      this.collisionRadius, 
+      toiletRadius
+    );
+    if (collision) {
+      // 3. Si el objeto es Enemy, daña el inodoro
+      if (this instanceof Enemy) {
+        if (this.game && typeof this.game._damageToilet === 'function') {
+          const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
+          this.game._damageToilet(toilet, 20 * deltaSeconds);
+        }
+      }
+      // 4. Ni el Hero ni los Enemy pueden atravesar el inodoro
+      const dx = this.position.x - toilet.position.x;
+      const dy = this.position.y - toilet.position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > 0) {
+        const overlap = (this.collisionRadius + toiletRadius) - distance;
+        this.position.x += (dx / distance) * overlap;
+        this.position.y += (dy / distance) * overlap;
+      }
+      // Detener la velocidad si choca contra el inodoro
+      const dotProduct = this.velocity.x * dx + this.velocity.y * dy;
+      if (dotProduct < 0) {
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+      }
+    }
+  }
+}
+
+  _resolveCollisionVelocity(other) {
+    const dx = this.position.x - other.position.x;
+    const dy = this.position.y - other.position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distance === 0) return;
+    
+    const nx = dx / distance;
+    const ny = dy / distance;
+    const dvx = this.velocity.x - other.velocity.x;
+    const dvy = this.velocity.y - other.velocity.y;
+    const dotProduct = dvx * nx + dvy * ny;
+    
+    if (dotProduct > 0) return;
+    
+    const impulse = dotProduct * 0.5;
+    this.velocity.x -= impulse * nx;
+    this.velocity.y -= impulse * ny;
+    
+    if (other.canPushOthers) {
+      other.velocity.x += impulse * nx;
+      other.velocity.y += impulse * ny;
     }
   }
 }

@@ -1,5 +1,4 @@
-// game.js - Sistema de cámara con interpolación lineal (lerp)
-
+//Camera system with linear interpolation (lerp)
 class Camera {
   constructor(viewportWidth, viewportHeight, worldWidth, worldHeight) {
     // Dimensiones de la vista de la cámara
@@ -68,6 +67,37 @@ class Camera {
       y: this.y - this.viewportHeight / 2
     };
   }
+}
+
+// Detect circular collision between two objects
+function checkCircleCollision(obj1, obj2, radius1, radius2) {
+  const dx = obj1.x - obj2.x;
+  const dy = obj1.y - obj2.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  return distance < (radius1 + radius2);
+}
+
+// Separate two objects in collision
+function separateObjects(obj1, obj2, radius1, radius2) {
+  const dx = obj1.x - obj2.x;
+  const dy = obj1.y - obj2.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  
+  if (distance === 0) {
+    const angle = Math.random() * Math.PI * 2;
+    obj1.x += Math.cos(angle) * (radius1 + radius2);
+    obj1.y += Math.sin(angle) * (radius1 + radius2);
+    return;
+  }
+  
+  const overlap = (radius1 + radius2) - distance;
+  const separationX = (dx / distance) * overlap * 0.5;
+  const separationY = (dy / distance) * overlap * 0.5;
+  
+  obj1.x += separationX;
+  obj1.y += separationY;
+  obj2.x -= separationX;
+  obj2.y -= separationY;
 }
 
 class Game {
@@ -476,8 +506,10 @@ class Game {
       isToilet: true,
       position: { x: worldPosition.x, y: worldPosition.y },
       hp: 100,
+      maxHp: 100,          
       destroyed: false,
-      sprite: sprite
+      sprite: sprite,
+      collisionRadius: 20  
     };
     this.toilets.push(toilet);
   }
