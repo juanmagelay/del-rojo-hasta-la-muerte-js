@@ -212,16 +212,21 @@ class Game {
     const enemySheetData = makeSpritesheetData(enemySheet);
     const heroSheetData = makeSpritesheetData(heroSheet);
 
-    // Create hero
+    // Hero en el centro del área de juego
     const hx = this.playArea.x + this.playArea.width * 0.5;
     const hy = this.playArea.y + this.playArea.height * 0.5;
     const hero = new Hero(heroSheetData, hx, hy, this);
     this.characters.push(hero);
 
-    // Create enemies
-    for ( let i = 0; i < 80; i++ ) {
-      const x = this.playArea.x + Math.random() * this.playArea.width;
-      const y = this.playArea.y + Math.random() * this.playArea.height;
+    // Enemigos en un radio alejado del héroe
+    const minEnemyDistance = 220; // distancia mínima al héroe
+    for (let i = 0; i < 80; i++) {
+      let x, y, dist;
+      do {
+        x = this.playArea.x + Math.random() * this.playArea.width;
+        y = this.playArea.y + Math.random() * this.playArea.height;
+        dist = Math.sqrt((x - hx) ** 2 + (y - hy) ** 2);
+      } while (dist < minEnemyDistance);
       const enemy = new Enemy(enemySheetData, x, y, this);
       enemy.target = hero;
       this.characters.push(enemy);

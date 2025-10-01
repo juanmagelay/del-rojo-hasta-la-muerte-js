@@ -11,9 +11,9 @@ class Enemy extends GameObject {
       // Boids tuning (radii in px, weights are multipliers)
       this.boids = {
         separationRadius: 32,
-        alignmentRadius: 140,
-        cohesionRadius: 160,
-        heroChaseRadius: 200,
+        alignmentRadius: 220,
+        cohesionRadius: 260,
+        heroChaseRadius: 400,
         separationWeight: 1.3,
         alignmentWeight: 0.8,
         cohesionWeight: 0.9,
