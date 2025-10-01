@@ -52,8 +52,8 @@ class GameObject {
             this.container.addChild(anim);
         }
 
-        // Add container to stage (same as before when you added a single sprite)
-        this.game.pixiApp.stage.addChild(this.container);
+        // Add container to world container
+        this.game.worldContainer.addChild(this.container);
         
         // Start with "idle" if available, otherwise the first animation
         if (this.spritesAnimated.idle) this.changeAnimation("idle");
@@ -95,7 +95,6 @@ class GameObject {
         this.velocity.y += this.acceleration.y * this.game.pixiApp.ticker.deltaTime;
 
         //Velocity variations
-        this.bounce(); //rebotar
         this.applyFriction();
         this.limitVelocity();
 
@@ -112,6 +111,9 @@ class GameObject {
         this.velocityMagnitude = Math.sqrt(
             this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y
         );
+
+        //Bounds
+        this._applyBounds();
     }
 
     // Hook for subclasses (Enemy/Hero) to set acceleration each frame
@@ -133,29 +135,6 @@ class GameObject {
       this.velocity.x *= friction;
       this.velocity.y *= friction;
     } 
-
-
-    // Constrain movement to stadium-stands (playArea)
-    // Bounce off the boundaries of the play area
-    //Multiply by -0.99, the sign is inverted (+ to - and inverse).
-    //And the 0.99 get lose 1% velocity.
-    bounce() {
-      // Constrain to stadium-stands (playArea)
-      const left = this.game.playArea.x;
-      const right = this.game.playArea.x + this.game.playArea.width;
-      const top = this.game.playArea.y;
-      const bottom = this.game.playArea.y + this.game.playArea.height;
-
-      if (this.position.x > right || this.position.x < left) {
-          this.velocity.x *= -0.99;
-          this.position.x = Math.min(Math.max(this.position.x, left), right);
-      }
-
-      if (this.position.y > bottom || this.position.y < top) {
-          this.velocity.y *= -0.99;
-          this.position.y = Math.min(Math.max(this.position.y, top), bottom);
-      }
-    }
 
     render() {
       // move container to current position
@@ -211,4 +190,33 @@ class GameObject {
           this.velocityMagnitude * 0.05 * this.game.pixiApp.ticker.deltaTime;
       }
     }
+
+    //Bounds
+    _applyBounds() {
+    // Verificar que tenemos acceso al juego y al área de juego
+    if (!this.game || !this.game.playArea) return;
+    
+    // Obtener límites del área de juego (stadium-stands)
+    const bounds = this.game.playArea; // { x: 0, y: 0, width: 1336, height: 1024 }
+    
+    // Limitar posición X entre 0 y 1336
+    if (this.position.x < bounds.x) {
+      this.position.x = bounds.x;
+      if (this.velocity) this.velocity.x = 0;
+    }
+    if (this.position.x > bounds.x + bounds.width) {
+      this.position.x = bounds.x + bounds.width;
+      if (this.velocity) this.velocity.x = 0;
+    }
+    
+    // Limitar posición Y entre 0 y 1024
+    if (this.position.y < bounds.y) {
+      this.position.y = bounds.y;
+      if (this.velocity) this.velocity.y = 0;
+    }
+    if (this.position.y > bounds.y + bounds.height) {
+      this.position.y = bounds.y + bounds.height;
+      if (this.velocity) this.velocity.y = 0;
+    }
+  }
 }

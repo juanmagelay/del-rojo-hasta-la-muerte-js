@@ -1,3 +1,75 @@
+// game.js - Sistema de cámara con interpolación lineal (lerp)
+
+class Camera {
+  constructor(viewportWidth, viewportHeight, worldWidth, worldHeight) {
+    // Dimensiones de la vista de la cámara
+    this.viewportWidth = viewportWidth;
+    this.viewportHeight = viewportHeight;
+    
+    // Dimensiones totales del mundo
+    this.worldWidth = worldWidth;
+    this.worldHeight = worldHeight;
+    
+    // Posición actual de la cámara (centro)
+    this.x = viewportWidth / 2;
+    this.y = viewportHeight / 2;
+    
+    // Posición objetivo (donde queremos que esté la cámara)
+    this.targetX = this.x;
+    this.targetY = this.y;
+    
+    // Factor de suavizado (0-1). Valores más bajos = más suave
+    // 0.1 significa que la cámara se moverá el 10% de la distancia cada frame
+    this.lerpFactor = 0.1;
+  }
+  
+  // Función de interpolación lineal
+  lerp(start, end, factor) {
+    return start + (end - start) * factor;
+  }
+  
+  // Actualizar la posición objetivo basado en el personaje
+  follow(targetX, targetY) {
+    this.targetX = targetX;
+    this.targetY = targetY;
+  }
+  
+  // Actualizar la posición de la cámara con lerp
+  update() {
+    // Aplicar interpolación lineal
+    this.x = this.lerp(this.x, this.targetX, this.lerpFactor);
+    this.y = this.lerp(this.y, this.targetY, this.lerpFactor);
+    
+    // Aplicar límites para que la cámara no salga del mundo
+    const halfViewportWidth = this.viewportWidth / 2;
+    const halfViewportHeight = this.viewportHeight / 2;
+    
+    // Limitar en X
+    if (this.x - halfViewportWidth < 0) {
+      this.x = halfViewportWidth;
+    }
+    if (this.x + halfViewportWidth > this.worldWidth) {
+      this.x = this.worldWidth - halfViewportWidth;
+    }
+    
+    // Limitar en Y
+    if (this.y - halfViewportHeight < 0) {
+      this.y = halfViewportHeight;
+    }
+    if (this.y + halfViewportHeight > this.worldHeight) {
+      this.y = this.worldHeight - halfViewportHeight;
+    }
+  }
+  
+  // Obtener el offset de la cámara para aplicar a PixiJS
+  getOffset() {
+    return {
+      x: this.x - this.viewportWidth / 2,
+      y: this.y - this.viewportHeight / 2
+    };
+  }
+}
+
 class Game {
   pixiApp;
   characters = []; // we keep the name for minimal changes
@@ -20,14 +92,22 @@ class Game {
   toiletCountText;
   toilets = [];
 
+  //Camera
+  camera;           //Camera
+  worldContainer;   //World container
+
   constructor() {
-    // Logical spaces inside the fixed background (1280 x 720)
+    // Logical spaces inside the fixed background
     this.playArea = { x: 0, y: 0, width: 1336, height: 1024 };   // stadium-stands (left)
     this.grassArea = { x: 1336, y: 0, width: 200, height: 1024 }; // stadium-grass (right)
 
-    // Single canvas covers 1280 x 720 (exact background size)
-    this.width = 1536;
-    this.height = 1024;
+    //World dimensions
+    this.worldWidth = 1536;  // 1336 + 200
+    this.worldHeight = 1024;
+
+    // Canvas (camera viewport)
+    this.width = 1024;
+    this.height = 768;
     this.mouse = { position: { x: 0, y: 0 } };
     this.initPIXI();    
   }
@@ -40,8 +120,8 @@ class Game {
 
     const pixiOptions = { 
         background: "#1099bb", 
-        width: this.width, 
-        height: this.height,
+        width: this.width,   //800
+        height: this.height, //800
         antialias: false,
         SCALE_MODE: PIXI.SCALE_MODES.NEAREST // pixelated rendering
     };
@@ -53,17 +133,31 @@ class Game {
 
     //Add canvas element created by Pixi into the HTML document
     document.body.appendChild( this.pixiApp.canvas );
+    
+    // Create the world container
+    // This container will move according to the camera
+    this.worldContainer = new PIXI.Container();
+    this.worldContainer.name = "worldContainer";
+    this.pixiApp.stage.addChild(this.worldContainer);
+
+    //Create the camera
+    this.camera = new Camera(
+      this.width,        // 800 viewport width
+      this.height,       // 800 viewport height
+      this.worldWidth,   // 1536 world width
+      this.worldHeight   // 1024 world height
+    );
 
     //Load the background
     const bgTexture = await PIXI.Assets.load( "stadium2.png" );
     const background = new PIXI.Sprite( bgTexture );
     background.x = 0;
     background.y = 0;
-    background.width = this.width;
-    background.height = this.height;
+    background.width = this.worldWidth;
+    background.height = this.worldHeight;
 
     // Load the background first (to be behind NPCs)
-    this.pixiApp.stage.addChild( background );
+    this.worldContainer.addChild(background);
     
     // UI Layer on top of everything
     this.uiLayer = new PIXI.Container();
@@ -106,6 +200,9 @@ class Game {
     // HUD
     await this._createHud();
 
+    //Add UI Layer to the stage (top layer)
+    this.pixiApp.stage.addChild(this.uiLayer);
+
     //Add the method this.gameLoop to the ticker.
     //In each frame we are executing the this.gameLoop method.
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
@@ -124,6 +221,19 @@ class Game {
 
   gameLoop( time ) {
     
+    //Add camera to follow the hero
+    const hero = this._getHero();
+    if (hero && this.camera) {
+      // Hacer que la cámara siga al héroe
+      this.camera.follow(hero.position.x, hero.position.y);
+      this.camera.update();
+      
+      // Aplicar la posición de la cámara al worldContainer
+      const offset = this.camera.getOffset();
+      this.worldContainer.x = -offset.x;
+      this.worldContainer.y = -offset.y;
+    }
+
     // Pre-brain targeting: attract enemies to nearest toilet if close
     const deltaSeconds = (this.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
     const activeToilets = this.toilets.filter(t => !t.destroyed);
@@ -360,8 +470,8 @@ class Game {
 
     sprite.x = worldPosition.x;
     sprite.y = worldPosition.y;
-    this.pixiApp.stage.addChild(sprite);
-
+    this.worldContainer.addChild(sprite);
+    
     const toilet = {
       isToilet: true,
       position: { x: worldPosition.x, y: worldPosition.y },
