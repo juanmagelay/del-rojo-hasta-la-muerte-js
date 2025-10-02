@@ -120,9 +120,27 @@ class GameMenuOverlay {
     }
   }
   showWin() {
+    this._resetOverlayLayout();
     this.title.textContent = 'Ganaste';
     this.button.textContent = 'Volver a jugar';
+    this._resetOverlayLayout();
     this.overlay.style.display = 'flex';
+    this.overlay.style.flexDirection = 'column';
+    this.overlay.style.alignItems = 'center';
+    this.overlay.style.justifyContent = 'center';
+    this.overlay.style.zIndex = '9999';
+    this.overlay.style.width = '100vw';
+    this.overlay.style.height = '100vh';
+    this.title.style.display = 'block';
+    this.title.style.margin = '0 auto';
+    this.button.style.display = 'block';
+    this.button.style.position = 'static';
+    this.button.style.margin = '32px 0 0 0';
+    this.button.style.zIndex = '10000';
+    // Inserta el botón justo después del título
+    if (this.title.nextSibling !== this.button) {
+      this.overlay.insertBefore(this.button, this.title.nextSibling);
+    }
     this.button.onclick = () => {
       this.overlay.style.display = 'none';
       this.game.restartGame();
@@ -177,19 +195,66 @@ class GameMenuOverlay {
     this.title.textContent = '';
     this.button.textContent = 'Jugar';
     this.overlay.style.display = 'flex';
-    this.button.onclick = () => {
-      this.showOnboarding();
-    };
+    // Detecta si viene de 'Volver a jugar' (reinicio)
+    if (this.game._justRestarted) {
+      // Oculta onboarding y comienza partida directamente
+      if (this._onboardingColumns) this._onboardingColumns.style.display = 'none';
+      if (this._onboardingImgCol) this._onboardingImgCol.style.display = 'none';
+      if (this._onboardingTextCol) this._onboardingTextCol.style.display = 'none';
+      if (this._onboardingImg) this._onboardingImg.style.display = 'none';
+      if (this._onboardingText) this._onboardingText.style.display = 'none';
+      this.button.onclick = () => {
+        this.overlay.style.display = 'none';
+        this.game._justRestarted = false;
+        this.game._finishOnboarding();
+      };
+    } else {
+      // Reset onboarding state and columns
+      if (this._onboardingColumns) this._onboardingColumns.style.display = '';
+      if (this._onboardingImgCol) this._onboardingImgCol.style.display = '';
+      if (this._onboardingTextCol) this._onboardingTextCol.style.display = '';
+      if (this._onboardingImg) this._onboardingImg.style.display = '';
+      if (this._onboardingText) this._onboardingText.style.display = '';
+      this.button.onclick = () => {
+        this.showOnboarding();
+      };
+    }
   }
 
   showGameOver() {
+    this._resetOverlayLayout();
     this.title.textContent = 'Perdiste';
     this.button.textContent = 'Volver a jugar';
+    this._resetOverlayLayout();
     this.overlay.style.display = 'flex';
+    this.overlay.style.flexDirection = 'column';
+    this.overlay.style.alignItems = 'center';
+    this.overlay.style.justifyContent = 'center';
+    this.overlay.style.zIndex = '9999';
+    this.overlay.style.width = '100vw';
+    this.overlay.style.height = '100vh';
+    this.title.style.display = 'block';
+    this.title.style.margin = '0 auto';
+    this.button.style.display = 'block';
+    this.button.style.position = 'static';
+    this.button.style.margin = '32px 0 0 0';
+    this.button.style.zIndex = '10000';
+    // Inserta el botón justo después del título
+    if (this.title.nextSibling !== this.button) {
+      this.overlay.insertBefore(this.button, this.title.nextSibling);
+    }
     this.button.onclick = () => {
       this.overlay.style.display = 'none';
       this.game.restartGame();
     };
+  }
+  _resetOverlayLayout() {
+    // Oculta columnas de onboarding si existen
+    if (this._onboardingColumns) this._onboardingColumns.style.display = 'none';
+    if (this._onboardingImgCol) this._onboardingImgCol.style.display = 'none';
+    if (this._onboardingTextCol) this._onboardingTextCol.style.display = 'none';
+    if (this._onboardingImg) this._onboardingImg.style.display = 'none';
+    if (this._onboardingText) this._onboardingText.style.display = 'none';
   }
 
   _bindEvents() {
