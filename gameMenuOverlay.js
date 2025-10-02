@@ -24,7 +24,7 @@ class GameMenuOverlay {
   _renderOnboardingSlide() {
     const slide = this._slides[this._currentSlide];
     this.title.textContent = '';
-    // Crea contenedor de columnas si no existe
+    //Create a two-column layout if not already created
     if (!this._onboardingColumns) {
       this._onboardingColumns = document.createElement('div');
       this._onboardingColumns.style.display = 'flex';
@@ -34,7 +34,7 @@ class GameMenuOverlay {
       this._onboardingColumns.style.gap = '0px';
       this.overlay.insertBefore(this._onboardingColumns, this.button);
     }
-    // Columna imagen
+    //Image column
     if (!this._onboardingImgCol) {
       this._onboardingImgCol = document.createElement('div');
       this._onboardingImgCol.style.width = '512px';
@@ -53,7 +53,7 @@ class GameMenuOverlay {
       this._onboardingImg.style.display = 'block';
     }
     this._onboardingImg.src = slide.img;
-    // Columna texto+botón
+    //Text + button column
     if (!this._onboardingTextCol) {
       this._onboardingTextCol = document.createElement('div');
       this._onboardingTextCol.style.display = 'flex';
@@ -76,11 +76,11 @@ class GameMenuOverlay {
       this._onboardingText.style.marginBottom = '32px';
     }
     this._onboardingText.textContent = slide.text;
-    // Botón debajo del texto
+    //Button under text
     this.button.style.display = 'block';
     this.button.style.margin = '0 auto';
     this.button.textContent = this._currentSlide < this._slides.length - 1 ? 'Siguiente' : '¡Jugar!';
-    // Limpia columnas y agrega elementos
+    //Clean cols and add elements
     this._onboardingColumns.innerHTML = '';
     this._onboardingImgCol.innerHTML = '';
     this._onboardingImgCol.appendChild(this._onboardingImg);
@@ -89,7 +89,7 @@ class GameMenuOverlay {
     this._onboardingTextCol.appendChild(this._onboardingText);
     this._onboardingTextCol.appendChild(this.button);
     this._onboardingColumns.appendChild(this._onboardingTextCol);
-    // Ajusta overlay
+    //Adjust overlay
     this.overlay.style.flexDirection = 'column';
     this.overlay.style.alignItems = 'center';
     this.overlay.style.justifyContent = 'center';
@@ -137,7 +137,7 @@ class GameMenuOverlay {
     this.button.style.position = 'static';
     this.button.style.margin = '32px 0 0 0';
     this.button.style.zIndex = '10000';
-    // Inserta el botón justo después del título
+    //Insert the button just after the title
     if (this.title.nextSibling !== this.button) {
       this.overlay.insertBefore(this.button, this.title.nextSibling);
     }
@@ -195,9 +195,9 @@ class GameMenuOverlay {
     this.title.textContent = '';
     this.button.textContent = 'Jugar';
     this.overlay.style.display = 'flex';
-    // Detecta si viene de 'Volver a jugar' (reinicio)
+    //Detect if the player comes from Play again action (Reset)
     if (this.game._justRestarted) {
-      // Oculta onboarding y comienza partida directamente
+      //Hide onboarding and start game directly
       if (this._onboardingColumns) this._onboardingColumns.style.display = 'none';
       if (this._onboardingImgCol) this._onboardingImgCol.style.display = 'none';
       if (this._onboardingTextCol) this._onboardingTextCol.style.display = 'none';
@@ -209,7 +209,7 @@ class GameMenuOverlay {
         this.game._finishOnboarding();
       };
     } else {
-      // Reset onboarding state and columns
+      //Reset onboarding state and columns
       if (this._onboardingColumns) this._onboardingColumns.style.display = '';
       if (this._onboardingImgCol) this._onboardingImgCol.style.display = '';
       if (this._onboardingTextCol) this._onboardingTextCol.style.display = '';
@@ -239,7 +239,7 @@ class GameMenuOverlay {
     this.button.style.position = 'static';
     this.button.style.margin = '32px 0 0 0';
     this.button.style.zIndex = '10000';
-    // Inserta el botón justo después del título
+    //Insert the button just after the title
     if (this.title.nextSibling !== this.button) {
       this.overlay.insertBefore(this.button, this.title.nextSibling);
     }
@@ -249,7 +249,7 @@ class GameMenuOverlay {
     };
   }
   _resetOverlayLayout() {
-    // Oculta columnas de onboarding si existen
+    //Hide onboarding columns if they exist
     if (this._onboardingColumns) this._onboardingColumns.style.display = 'none';
     if (this._onboardingImgCol) this._onboardingImgCol.style.display = 'none';
     if (this._onboardingTextCol) this._onboardingTextCol.style.display = 'none';

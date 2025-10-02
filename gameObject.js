@@ -201,32 +201,32 @@ class GameObject {
 
     //Bounds
     _applyBounds() {
-    // Check game and playArea access
-    if (!this.game || !this.game.playArea) return;
-    
-    // Obtain limits of playArea (stadium-stands)
-    const bounds = this.game.playArea; // { x: 0, y: 0, width: 1336, height: 1024 }
-    
-    // Limit X position between 0 and 1336
-    if (this.position.x < bounds.x) {
-      this.position.x = bounds.x;
-      if (this.velocity) this.velocity.x = 0;
+      if (!this.game || !this.game.playArea) return;
+      const bounds = this.game.playArea;
+      //X: equal for all
+      if (this.position.x < bounds.x) {
+        this.position.x = bounds.x;
+        if (this.velocity) this.velocity.x = 0;
+      }
+      if (this.position.x > bounds.x + bounds.width) {
+        this.position.x = bounds.x + bounds.width;
+        if (this.velocity) this.velocity.x = 0;
+      }
+      //Y: adjusts the upper limit for hero/enemy based on the sprite size
+      let minY = bounds.y;
+      if ((this instanceof Hero || this instanceof Enemy) && this.container && this.container.height) {
+        //The anchor is at the base (y=1), so the center of the sprite must be inside
+        minY = bounds.y + this.container.height * 0.5;
+      }
+      if (this.position.y < minY) {
+        this.position.y = minY;
+        if (this.velocity) this.velocity.y = 0;
+      }
+      if (this.position.y > bounds.y + bounds.height) {
+        this.position.y = bounds.y + bounds.height;
+        if (this.velocity) this.velocity.y = 0;
+      }
     }
-    if (this.position.x > bounds.x + bounds.width) {
-      this.position.x = bounds.x + bounds.width;
-      if (this.velocity) this.velocity.x = 0;
-    }
-    
-    // Limit Y position between 0 and 1024
-    if (this.position.y < bounds.y) {
-      this.position.y = bounds.y;
-      if (this.velocity) this.velocity.y = 0;
-    }
-    if (this.position.y > bounds.y + bounds.height) {
-      this.position.y = bounds.y + bounds.height;
-      if (this.velocity) this.velocity.y = 0;
-    }
-  }
 
     _handleCollisions() {
     if (!this.isSolid) return;
@@ -279,10 +279,10 @@ class GameObject {
       }
     }
   
-  // Collisions with toilets
+  //Collisions with toilets
   const activeToilets = this.game.toilets.filter(t => !t.destroyed);
   for (let toilet of activeToilets) {
-    // Toilet collision radius
+    //Toilet collision radius
     const toiletRadius = toilet.collisionRadius || 20;
     const collision = checkCircleCollision(
       this.position, 
