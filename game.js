@@ -195,8 +195,8 @@ class Game {
     // Keep draw order simple: last added is on top
     
     //Load spritesheet JSON
-    const enemySheet = await PIXI.Assets.load("spritesheets/independiente.json");
-    const heroSheet  = await PIXI.Assets.load("spritesheets/UDeChile.json");
+    const enemySheet = await PIXI.Assets.load("spritesheets/UDeChile.json");
+    const heroSheet  = await PIXI.Assets.load("spritesheets/independiente.json");
 
     //Load each animation as an array of textures
     const makeSpritesheetData = (sheet) => ({
