@@ -196,7 +196,7 @@ class Game {
     
     //Load spritesheet JSON
     const enemySheet = await PIXI.Assets.load("spritesheets/independiente.json");
-    const heroSheet  = await PIXI.Assets.load("spritesheets/boca.json");
+    const heroSheet  = await PIXI.Assets.load("spritesheets/UDeChile.json");
 
     //Load each animation as an array of textures
     const makeSpritesheetData = (sheet) => ({

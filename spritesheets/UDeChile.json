@@ -27,7 +27,7 @@
     "idle":  ["idle_0.png","idle_1.png","idle_2.png","idle_3.png"]
   },
   "meta": {
-    "image": "boca.png",
+    "image": "UDeChile.png",
     "format": "RGBA8888",
     "size": { "w": 214, "h": 19 },
     "scale": 1
