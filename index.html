@@ -6,6 +6,8 @@
         body {
           margin: 0px;
           font-family: 'VT323', Arial, sans-serif;
+          background: #382F28;
+          min-height: 100vh;
         }
     </style>
     
@@ -29,6 +31,9 @@
 
   </head>
   <body>
+      <div id="game-bg-center" style="position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;z-index:1;">
+        <div id="game-canvas-center" style="width:1024px;height:768px;position:relative;z-index:2;"></div>
+      </div>
       <script>
         //Modify Game to support overlay at start and end
         class GameWithOverlay extends Game {

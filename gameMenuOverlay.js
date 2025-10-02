@@ -129,14 +129,17 @@ class GameMenuOverlay {
     this.overlay.style.alignItems = 'center';
     this.overlay.style.justifyContent = 'center';
     this.overlay.style.zIndex = '9999';
-    this.overlay.style.width = '100vw';
-    this.overlay.style.height = '100vh';
+    this.overlay.style.width = '1024px';
+    this.overlay.style.height = '768px';
     this.title.style.display = 'block';
-    this.title.style.margin = '0 auto';
+    this.title.style.margin = '0 auto 32px auto';
+    this.title.style.textAlign = 'center';
     this.button.style.display = 'block';
     this.button.style.position = 'static';
-    this.button.style.margin = '32px 0 0 0';
+    this.button.style.margin = '0 auto';
+    this.button.style.marginTop = '32px';
     this.button.style.zIndex = '10000';
+    this.button.style.textAlign = 'center';
     //Insert the button just after the title
     if (this.title.nextSibling !== this.button) {
       this.overlay.insertBefore(this.button, this.title.nextSibling);
@@ -154,41 +157,48 @@ class GameMenuOverlay {
   }
 
   _createOverlay() {
+    // Busca el contenedor centrado del juego
+    const centerDiv = document.getElementById('game-canvas-center');
+    // Overlay absoluto dentro del contenedor de 1024x768
     this.overlay = document.createElement('div');
     this.overlay.id = 'game-menu-overlay';
     Object.assign(this.overlay.style, {
-      position: 'fixed',
+      position: 'absolute',
       top: 0,
       left: 0,
-      width: '100vw',
-      height: '100vh',
+      width: '1024px',
+      height: '768px',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 9999,
       background: 'rgba(0,0,0,0.4)',
+      boxShadow: '0 0 32px 0 rgba(0,0,0,0.7)',
+      borderRadius: '18px',
+      overflow: 'hidden',
+      pointerEvents: 'auto'
     });
-    document.body.appendChild(this.overlay);
+    if (centerDiv) centerDiv.appendChild(this.overlay);
 
-  this.title = document.createElement('h1');
-  this.title.style.color = '#fff';
-  this.title.style.fontFamily = 'VT323, Arial, sans-serif';
-  this.title.style.fontSize = '3rem';
-  this.title.style.marginBottom = '32px';
-  this.overlay.appendChild(this.title);
+    this.title = document.createElement('h1');
+    this.title.style.color = '#fff';
+    this.title.style.fontFamily = 'VT323, Arial, sans-serif';
+    this.title.style.fontSize = '3rem';
+    this.title.style.marginBottom = '32px';
+    this.overlay.appendChild(this.title);
 
-  this.button = document.createElement('button');
-  this.button.style.fontSize = '2rem';
-  this.button.style.fontFamily = 'VT323, Arial, sans-serif';
-  this.button.style.padding = '16px 48px';
-  this.button.style.borderRadius = '12px';
-  this.button.style.border = 'none';
-  this.button.style.background = '#382F28';
-  this.button.style.color = '#E3C3A8';
-  this.button.style.cursor = 'pointer';
-  this.button.style.marginTop = '16px';
-  this.overlay.appendChild(this.button);
+    this.button = document.createElement('button');
+    this.button.style.fontSize = '2rem';
+    this.button.style.fontFamily = 'VT323, Arial, sans-serif';
+    this.button.style.padding = '16px 48px';
+    this.button.style.borderRadius = '12px';
+    this.button.style.border = 'none';
+    this.button.style.background = '#382F28';
+    this.button.style.color = '#E3C3A8';
+    this.button.style.cursor = 'pointer';
+    this.button.style.marginTop = '16px';
+    this.overlay.appendChild(this.button);
   }
 
   showStart() {
@@ -231,14 +241,17 @@ class GameMenuOverlay {
     this.overlay.style.alignItems = 'center';
     this.overlay.style.justifyContent = 'center';
     this.overlay.style.zIndex = '9999';
-    this.overlay.style.width = '100vw';
-    this.overlay.style.height = '100vh';
+    this.overlay.style.width = '1024px';
+    this.overlay.style.height = '768px';
     this.title.style.display = 'block';
-    this.title.style.margin = '0 auto';
+    this.title.style.margin = '0 auto 32px auto';
+    this.title.style.textAlign = 'center';
     this.button.style.display = 'block';
     this.button.style.position = 'static';
-    this.button.style.margin = '32px 0 0 0';
+    this.button.style.margin = '0 auto';
+    this.button.style.marginTop = '32px';
     this.button.style.zIndex = '10000';
+    this.button.style.textAlign = 'center';
     //Insert the button just after the title
     if (this.title.nextSibling !== this.button) {
       this.overlay.insertBefore(this.button, this.title.nextSibling);

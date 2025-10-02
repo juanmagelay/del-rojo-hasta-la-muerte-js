@@ -161,8 +161,9 @@ class Game {
     //2ms., 400mx. (...) I don't know how much time.
     await this.pixiApp.init( pixiOptions );
 
-    //Add canvas element created by Pixi into the HTML document
-    document.body.appendChild( this.pixiApp.canvas );
+  //Add canvas element created by Pixi en el contenedor centrado
+  const centerDiv = document.getElementById('game-canvas-center');
+  if (centerDiv) centerDiv.appendChild(this.pixiApp.canvas);
     
     // Create the world container
     // This container will move according to the camera
