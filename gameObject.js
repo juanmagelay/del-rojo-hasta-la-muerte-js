@@ -201,13 +201,13 @@ class GameObject {
 
     //Bounds
     _applyBounds() {
-    // Verificar que tenemos acceso al juego y al área de juego
+    // Check game and playArea access
     if (!this.game || !this.game.playArea) return;
     
-    // Obtener límites del área de juego (stadium-stands)
+    // Obtain limits of playArea (stadium-stands)
     const bounds = this.game.playArea; // { x: 0, y: 0, width: 1336, height: 1024 }
     
-    // Limitar posición X entre 0 y 1336
+    // Limit X position between 0 and 1336
     if (this.position.x < bounds.x) {
       this.position.x = bounds.x;
       if (this.velocity) this.velocity.x = 0;
@@ -217,7 +217,7 @@ class GameObject {
       if (this.velocity) this.velocity.x = 0;
     }
     
-    // Limitar posición Y entre 0 y 1024
+    // Limit Y position between 0 and 1024
     if (this.position.y < bounds.y) {
       this.position.y = bounds.y;
       if (this.velocity) this.velocity.y = 0;
@@ -230,7 +230,7 @@ class GameObject {
 
     _handleCollisions() {
     if (!this.isSolid) return;
-    // Colisiones con personajes
+    // Collision with other solid characters
     for (let other of this.game.characters) {
       if (other === this) continue;
       if (!other.isSolid) continue;
@@ -241,22 +241,22 @@ class GameObject {
         other.collisionRadius
       );
       if (collision) {
-        // 1. Enemy colisiona con Hero: solo daño, NO lo mueve
+        // 1. Enemy collide with Hero: only damage, DOES NOT move it
         if (this instanceof Enemy && other instanceof Hero) {
           if (this.game && typeof this.game._applyHeroDamage === 'function') {
             const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
             this.game._applyHeroDamage(6 * deltaSeconds);
           }
-          // NO separar ni modificar velocidad del Hero
+          // DO NOT separate or modify the speed of the Hero
           continue;
         }
-        // 2. Hero colisiona con Enemy: solo lo mueve si está presionando una flecha
+        // 2. Hero collide with Enemy: he only moves it if pressing an arrow
         if (this instanceof Hero && other instanceof Enemy) {
           if (this.game && typeof this.game._applyHeroDamage === 'function') {
             const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
             this.game._applyHeroDamage(6 * deltaSeconds);
           }
-          // Solo arrastra si está presionando una flecha
+          // He only moves it if pressing an arrow
           if (this.input && (this.input.up || this.input.down || this.input.left || this.input.right)) {
             separateObjects(
               this.position, 
@@ -268,7 +268,7 @@ class GameObject {
           }
           continue;
         }
-        // Separar y resolver velocidad normalmente para otros casos
+        // Separate and solve velocity normally for other cases
         separateObjects(
           this.position, 
           other.position, 
@@ -279,10 +279,10 @@ class GameObject {
       }
     }
   
-  // Colisiones con inodoros
+  // Collisions with toilets
   const activeToilets = this.game.toilets.filter(t => !t.destroyed);
   for (let toilet of activeToilets) {
-    // Asegura que el inodoro tenga radio de colisión
+    // Toilet collision radius
     const toiletRadius = toilet.collisionRadius || 20;
     const collision = checkCircleCollision(
       this.position, 
@@ -291,14 +291,14 @@ class GameObject {
       toiletRadius
     );
     if (collision) {
-      // 3. Si el objeto es Enemy, daña el inodoro
+      // 3. If the object is Enemy, it hurts the toilet
       if (this instanceof Enemy) {
         if (this.game && typeof this.game._damageToilet === 'function') {
           const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
           this.game._damageToilet(toilet, 20 * deltaSeconds);
         }
       }
-      // 4. Ni el Hero ni los Enemy pueden atravesar el inodoro
+      // 4. Neither the hero nor the enemy can get through the toilet
       const dx = this.position.x - toilet.position.x;
       const dy = this.position.y - toilet.position.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -307,7 +307,7 @@ class GameObject {
         this.position.x += (dx / distance) * overlap;
         this.position.y += (dy / distance) * overlap;
       }
-      // Detener la velocidad si choca contra el inodoro
+      // Zero speed if it hits the toilet
       const dotProduct = this.velocity.x * dx + this.velocity.y * dy;
       if (dotProduct < 0) {
         this.velocity.x = 0;

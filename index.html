@@ -20,17 +20,17 @@
     <!-- Import PixiJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.13.0/pixi.min.js"></script>
 
-  <!-- Import game and classes (order matters for globals) -->
-  <script src="gameObject.js"></script>
-  <script src="enemy.js"></script>
-  <script src="hero.js"></script>
-  <script src="game.js"></script>
-  <script src="gameMenuOverlay.js"></script>
+    <!-- Import game and classes (order matters for globals) -->
+    <script src="gameObject.js"></script>
+    <script src="enemy.js"></script>
+    <script src="hero.js"></script>
+    <script src="game.js"></script>
+    <script src="gameMenuOverlay.js"></script>
 
   </head>
   <body>
       <script>
-        // Modifica Game para soportar overlay de inicio y fin
+        //Modify Game to support overlay at start and end
         class GameWithOverlay extends Game {
           constructor() {
             super();
@@ -47,7 +47,7 @@
             this._updateToiletCounter();
           }
           restartGame() {
-            // Quita todos los inodoros
+            //Remove all toilets
             for (const t of this.toilets) {
               if (t.sprite && t.sprite.destroy) t.sprite.destroy();
             }

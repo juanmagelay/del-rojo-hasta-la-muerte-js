@@ -6,7 +6,7 @@ class Enemy extends GameObject {
     constructor ( spritesheetData, x, y, game ) {
       super( spritesheetData, x, y, game );
 
-      // Target
+      //Target
       this.target = null;
 
       // Boids tuning (radii in px, weights are multipliers)
@@ -24,17 +24,17 @@ class Enemy extends GameObject {
 
     applyBrain() {
       if (!this.active) return;
-      // Buscar inodoro cercano primero
+      //Look for a nearby toilet first
       const nearbyToilet = this._findNearestToilet();
       if (nearbyToilet) {
-        // Si hay inodoro cerca, atacarlo
+        //If there is a toilet nearby, attack it
         this.target = nearbyToilet;
       } else {
-        // Si no, perseguir al hero
+        //If not, chase the hero
         const hero = this.game.characters.find(c => c instanceof Hero);
         this.target = hero || null;
       }
-      // Si muy cerca del objetivo, detenerse
+      //If the enemy are too close to the target, stop
       if (this.target) {
         const targetPos = this.target.position ? this.target.position : this.target;
         const dStop = calculateDistance(this.position, targetPos);
@@ -46,7 +46,7 @@ class Enemy extends GameObject {
           return;
         }
       }
-      // Boids: separation, alignment, cohesion
+      //Boids: separation, alignment, cohesion
       const neighbors = this._getNeighbors(Math.max(
         this.boids.separationRadius, 
         this.boids.alignmentRadius, 
@@ -69,7 +69,7 @@ class Enemy extends GameObject {
       const targetPos = this.target.position ? this.target.position : this.target;
       const dist = calculateDistance(this.position, targetPos);
       
-      // Mayor radio para inodoros
+      //Larger radius for toilets
       const chaseRadius = this.target.isToilet ? 220 : this.boids.heroChaseRadius;
       
       if (dist > chaseRadius) return;
@@ -79,7 +79,7 @@ class Enemy extends GameObject {
       const magnitude = Math.sqrt(difX * difX + difY * difY);
       
       if (magnitude > 0) {
-        // Más agresivo con inodoros
+        //More aggressive with toilets
         const intensity = this.target.isToilet ? 0.15 : 0.1;
         this.acceleration.x += (difX / magnitude) * intensity;
         this.acceleration.y += (difY / magnitude) * intensity;
@@ -88,7 +88,7 @@ class Enemy extends GameObject {
 
     wander() {     
       
-      // Add small random acceleration to keep characters moving        
+      //Add small random acceleration to keep characters moving        
       if (Math.abs(this.acceleration.x) < 0.01 && Math.abs(this.acceleration.y) < 0.01) {
         this.acceleration.x += (Math.random() - 0.5) * 0.05;
         this.acceleration.y += (Math.random() - 0.5) * 0.05;
@@ -114,7 +114,7 @@ class Enemy extends GameObject {
       for (let n of neighbors) {
         const d = calculateDistance(this.position, n.position);
         if (d > 0 && d < this.boids.separationRadius) {
-          // Vector desde vecino hacia mí, más fuerte cuanto más cerca
+          //Vector from neighbor to me, stronger the closer
           const diffX = this.position.x - n.position.x;
           const diffY = this.position.y - n.position.y;
           const inv = 1 / d;
@@ -146,7 +146,7 @@ class Enemy extends GameObject {
 		}
 		if (count > 0) {
 			sum.x /= count; sum.y /= count;
-			// steering = desired - currentVelocity (approx)
+			//steering = desired - currentVelocity (approx)
 			let steer = { x: sum.x - this.velocity.x, y: sum.y - this.velocity.y };
 			const mag = Math.sqrt(steer.x * steer.x + steer.y * steer.y);
 			if (mag > 0) {
@@ -187,7 +187,7 @@ class Enemy extends GameObject {
     if (activeToilets.length === 0) return null;
     
     let nearest = null;
-    let minDist = 220; // Radio de detección
+    let minDist = 220; //Detection radius
     
     for (let toilet of activeToilets) {
       const dist = calculateDistance(this.position, toilet.position);

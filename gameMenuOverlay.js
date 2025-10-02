@@ -1,5 +1,5 @@
 // gameMenuOverlay.js
-// Overlay para control de inicio y fin de partida
+// Overlay to show start, game over, and win screens
 
 class GameMenuOverlay {
   showWin() {
@@ -77,7 +77,7 @@ class GameMenuOverlay {
   }
 
   _bindEvents() {
-    // Evita mover el hero/enemigos si el overlay está visible
+    //Avoid moving the hero/enemies if the overlay is visible
     window.addEventListener('keydown', (e) => {
       if (this.overlay.style.display === 'flex') {
         e.preventDefault();
@@ -86,8 +86,3 @@ class GameMenuOverlay {
     }, true);
   }
 }
-
-// Para usarlo:
-// const overlay = new GameMenuOverlay(game);
-// overlay.showStart();
-// overlay.showGameOver();

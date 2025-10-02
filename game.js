@@ -179,7 +179,7 @@ class Game {
     );
 
     //Load the background
-    const bgTexture = await PIXI.Assets.load( "stadium2.png" );
+    const bgTexture = await PIXI.Assets.load( "stadium-desktop.png" );
     const background = new PIXI.Sprite( bgTexture );
     background.x = 0;
     background.y = 0;
@@ -439,9 +439,9 @@ class Game {
     row.y = panelHeight / 2; // center vertically
     container.addChild(row);
 
-    // Try to load inodoro.png, fall back to a placeholder
+    // Try to load toilet.png, fall back to a placeholder
     try {
-      const tex = await PIXI.Assets.load("inodoro.png");
+      const tex = await PIXI.Assets.load("toilet.png");
       this.toiletIconSprite = new PIXI.Sprite(tex);
       this.toiletIconSprite.scale.set(0.25);
       this.toiletIconSprite.anchor.set(0, 0.5); //Left, vertical centered
@@ -492,7 +492,7 @@ class Game {
     // Visual sprite or placeholder
     let sprite = null;
     try {
-      const tex = await PIXI.Assets.load("inodoro.png");
+      const tex = await PIXI.Assets.load("toilet.png");
       sprite = new PIXI.Sprite(tex);
       sprite.anchor.set(0.5, 1);
       sprite.scale.set(0.5);

@@ -8,7 +8,7 @@ class Hero extends GameObject {
     constructor(spritesheetData, x, y, game) {
         super(spritesheetData, x, y, game);
         this.input = { up: false, down: false, left: false, right: false };
-        this.moveAcceleration = 0.2; // Acceleration per input
+        this.moveAcceleration = 0.2; //Acceleration per input
         this.maxVelocity = 4;
         this._attachInput();
     }
@@ -35,12 +35,12 @@ class Hero extends GameObject {
     }
 
     _onClick(e) {
-        // acción de click del héroe (placeholder)
+        //Hero click action (placeholder)
     }
 
     _onKeyX() {
         if (!this.game || !this.game.placeToilet) return;
-        // Place a toilet at hero's current world position
+        //Place a toilet at hero's current world position
         this.game.placeToilet({ x: this.position.x, y: this.position.y });
     }
 
