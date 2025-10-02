@@ -36,11 +36,13 @@
             super();
             this.overlay = new GameMenuOverlay(this);
             this._gameActive = false;
+            this._onboardingActive = false;
           }
           startGame() {
-            this._gameActive = true;
-            this._enableHeroInput(true);
-            this._enableEnemies(true);
+            this._onboardingActive = true;
+            this._gameActive = false;
+            this._enableHeroInput(false);
+            this._enableEnemies(false);
             this.health = this.maxHealth;
             this.toiletCount = 10;
             this._updateHealthBar();
@@ -58,8 +60,10 @@
             this._timerAccumulatorMs = 0;
             this._updateHealthBar();
             this._updateToiletCounter();
-            this._enableHeroInput(true);
-            this._enableEnemies(true);
+            this._enableHeroInput(false);
+            this._enableEnemies(false);
+            this._onboardingActive = true;
+            this._gameActive = false;
             this.overlay.showStart();
           }
           _enableHeroInput(enable) {
@@ -85,6 +89,12 @@
               this._enableEnemies(false);
               this.overlay.showWin();
             }
+          }
+          _finishOnboarding() {
+            this._onboardingActive = false;
+            this._gameActive = true;
+            this._enableHeroInput(true);
+            this._enableEnemies(true);
           }
         }
         const game = new GameWithOverlay();
