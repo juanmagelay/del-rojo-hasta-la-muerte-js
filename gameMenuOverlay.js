@@ -7,11 +7,11 @@ class GameMenuOverlay {
     this._slides = [
       {
         img: 'onboarding-1.png',
-        text: `🟥 Copa Sudamericana 2025, octavos de final: el Rojo contra la U de Chile… ¡partido bravo!\n👤 Vos sos el ÚNICO hincha de Independiente en la tribuna visitante… ¡qué loco!\n💥 Los de la U quieren revolearte a la cancha y que se suspenda el partido.`
+        text: `🟥 Copa Sudamericana 2025, octavos de final: el Rojo contra la U de Chile… ¡partido bravo!\n\n👤 Vos sos el ÚNICO hincha de Independiente en la tribuna visitante… ¡qué loco!\n\n💥 Los de la U quieren revolearte a la cancha y que se suspenda el partido.`
       },
       {
         img: 'onboarding-2.png',
-        text: `🚽 Pero hay algo que los tienta más… romper inodoros, y vos tenés varios.\n🎮 Usá las flechas del teclado para moverte y poné inodoros con la tecla X para distraerlos unos segundos.\n⏱️ Resistí el último minuto del partido. Si te sacan toda la vida antes, volás a la cancha y se pudre todo.`
+        text: `🚽 Pero hay algo que los tienta más… romper inodoros, y vos tenés varios.\n\n🎮 Usá las flechas del teclado para moverte y poné inodoros con la tecla X para distraerlos unos segundos.\n\n⏱️ Resistí el último minuto del partido. Si te sacan toda la vida antes, volás a la cancha y se pudre todo.`
       }
     ];
     this._renderOnboardingSlide();
@@ -51,6 +51,7 @@ class GameMenuOverlay {
       this._onboardingImg.style.maxWidth = '512px';
       this._onboardingImg.style.height = 'auto';
       this._onboardingImg.style.display = 'block';
+      this._onboardingImg.style.borderRadius = '12px';
     }
     this._onboardingImg.src = slide.img;
     //Text + button column
@@ -63,14 +64,14 @@ class GameMenuOverlay {
       this._onboardingTextCol.style.paddingRight = '8px';
       this._onboardingTextCol.style.boxSizing = 'border-box';
       this._onboardingTextCol.style.justifyContent = 'center';
-      this._onboardingTextCol.style.alignItems = 'center';
+      this._onboardingTextCol.style.alignItems = 'flex-start';
     }
     if (!this._onboardingText) {
       this._onboardingText = document.createElement('div');
       this._onboardingText.style.width = '100%';
       this._onboardingText.style.color = '#E3C3A8';
       this._onboardingText.style.fontFamily = 'VT323, Arial, sans-serif';
-      this._onboardingText.style.fontSize = '1.6rem';
+      this._onboardingText.style.fontSize = '1.4rem';
       this._onboardingText.style.whiteSpace = 'pre-line';
       this._onboardingText.style.textAlign = 'left';
       this._onboardingText.style.marginBottom = '32px';
@@ -78,7 +79,7 @@ class GameMenuOverlay {
     this._onboardingText.textContent = slide.text;
     //Button under text
     this.button.style.display = 'block';
-    this.button.style.margin = '0 auto';
+    this.button.style.margin = '0';
     this.button.textContent = this._currentSlide < this._slides.length - 1 ? 'Siguiente' : '¡Jugar!';
     //Clean cols and add elements
     this._onboardingColumns.innerHTML = '';

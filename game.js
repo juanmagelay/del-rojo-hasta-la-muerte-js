@@ -465,7 +465,7 @@ class Game {
     });
     this.toiletCountText.scale.set(2);
     this.toiletCountText.anchor.set(0, 0.5); //Left, vertical centered
-    this.toiletCountText.x = 40; //Separation from icon
+    this.toiletCountText.x = 44; //Separation from icon
     row.addChild(this.toiletCountText);
 
     //Add to UI Layer
