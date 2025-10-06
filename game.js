@@ -213,15 +213,15 @@ class Game {
     const enemySheetData = makeSpritesheetData(enemySheet);
     const heroSheetData = makeSpritesheetData(heroSheet);
 
-    // Hero en el centro del área de juego
-    const hx = this.playArea.x + this.playArea.width * 0.5;
+    // Hero in the center of Y axis but in the right side of the play area
+    const hx = this.playArea.x + this.playArea.width;
     const hy = this.playArea.y + this.playArea.height * 0.5;
     const hero = new Hero(heroSheetData, hx, hy, this);
     this.characters.push(hero);
 
-    // Enemigos en un radio alejado del héroe
-    const minEnemyDistance = 220; // distancia mínima al héroe
-    for (let i = 0; i < 80; i++) {
+    // Enemies randomly placed in the play area, but not too close to the hero
+    const minEnemyDistance = 200; // min distance from hero
+    for (let i = 0; i < 100; i++) {
       let x, y, dist;
       do {
         x = this.playArea.x + Math.random() * this.playArea.width;
@@ -242,8 +242,6 @@ class Game {
     //Add the method this.gameLoop to the ticker.
     //In each frame we are executing the this.gameLoop method.
     this.pixiApp.ticker.add(this.gameLoop.bind(this));
-    
-    // Hero attaches its own input listeners; mouse move listener optional
   }
 
   //Functions
