@@ -3,6 +3,8 @@
 
 class GameMenuOverlay {
   showOnboarding() {
+  // Ocultar logo si existe
+  if (this._logoImg) this._logoImg.style.display = 'none';
     this._currentSlide = 0;
     this._slides = [
       {
@@ -121,6 +123,8 @@ class GameMenuOverlay {
     }
   }
   showWin() {
+  // Ocultar logo si existe
+  if (this._logoImg) this._logoImg.style.display = 'none';
     this._resetOverlayLayout();
     this.title.textContent = 'Ganaste';
     this.button.textContent = 'Volver a jugar';
@@ -206,8 +210,28 @@ class GameMenuOverlay {
     this.title.textContent = '';
     this.button.textContent = 'Jugar';
     this.overlay.style.display = 'flex';
+    
     //Detect if the player comes from Play again action (Reset)
+    //Logo only for Start Screen
+    if (!this._logoImg) {
+      this._logoImg = document.createElement('img');
+      this._logoImg.src = 'logo.png';
+      this._logoImg.alt = 'Logo';
+      this._logoImg.style.display = 'block';
+      this._logoImg.style.margin = '0 auto 0 auto';
+      this._logoImg.style.width = '384px';
+      this._logoImg.style.height = 'auto';
+    }
+    //Insert logo just above the Play Button
+    if (this.overlay.contains(this._logoImg)) {
+      this._logoImg.style.display = 'block';
+    } else {
+      this.overlay.insertBefore(this._logoImg, this.button);
+    }
+    //Detect if el jugador viene de "Volver a jugar"
     if (this.game._justRestarted) {
+      //Ocultar logo en otros estados
+      if (this._logoImg) this._logoImg.style.display = 'none';
       //Hide onboarding and start game directly
       if (this._onboardingColumns) this._onboardingColumns.style.display = 'none';
       if (this._onboardingImgCol) this._onboardingImgCol.style.display = 'none';
@@ -220,6 +244,8 @@ class GameMenuOverlay {
         this.game._finishOnboarding();
       };
     } else {
+      //Mostrar logo solo en pantalla de inicio
+      if (this._logoImg) this._logoImg.style.display = 'block';
       //Reset onboarding state and columns
       if (this._onboardingColumns) this._onboardingColumns.style.display = '';
       if (this._onboardingImgCol) this._onboardingImgCol.style.display = '';
@@ -233,6 +259,8 @@ class GameMenuOverlay {
   }
 
   showGameOver() {
+  // Ocultar logo si existe
+  if (this._logoImg) this._logoImg.style.display = 'none';
     this._resetOverlayLayout();
     this.title.textContent = 'Perdiste';
     this.button.textContent = 'Volver a jugar';
