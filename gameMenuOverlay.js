@@ -218,7 +218,7 @@ class GameMenuOverlay {
       this._logoImg.src = 'logo.png';
       this._logoImg.alt = 'Logo';
       this._logoImg.style.display = 'block';
-      this._logoImg.style.margin = '0 auto 0 auto';
+      this._logoImg.style.margin = '0 auto 20px auto';
       this._logoImg.style.width = '384px';
       this._logoImg.style.height = 'auto';
     }
