@@ -8,11 +8,11 @@ class GameMenuOverlay {
     this._currentSlide = 0;
     this._slides = [
       {
-        img: 'onboarding-1.png',
+  img: 'images/onboarding-1.png',
         text: `🟥 Copa Sudamericana 2025, octavos de final: el Rojo contra la U de Chile… ¡partido bravo!\n\n👤 Vos sos el ÚNICO hincha de Independiente en la tribuna visitante… ¡qué loco!\n\n💥 Los de la U quieren revolearte a la cancha y que se suspenda el partido.`
       },
       {
-        img: 'onboarding-2.png',
+  img: 'images/onboarding-2.png',
         text: `🚽 Pero hay algo que los tienta más… romper inodoros, y vos tenés varios.\n\n🎮 Usá las flechas del teclado para moverte y poné inodoros con la tecla X para distraerlos unos segundos.\n\n⏱️ Resistí el último minuto del partido. Si te sacan toda la vida antes, volás a la cancha y se pudre todo.`
       }
     ];
@@ -55,7 +55,7 @@ class GameMenuOverlay {
       this._onboardingImg.style.display = 'block';
       this._onboardingImg.style.borderRadius = '12px';
     }
-    this._onboardingImg.src = slide.img;
+  this._onboardingImg.src = slide.img;
     //Text + button column
     if (!this._onboardingTextCol) {
       this._onboardingTextCol = document.createElement('div');
@@ -215,7 +215,7 @@ class GameMenuOverlay {
     //Logo only for Start Screen
     if (!this._logoImg) {
       this._logoImg = document.createElement('img');
-      this._logoImg.src = 'logo.png';
+  this._logoImg.src = 'images/logo.png';
       this._logoImg.alt = 'Logo';
       this._logoImg.style.display = 'block';
       this._logoImg.style.margin = '0 auto 20px auto';

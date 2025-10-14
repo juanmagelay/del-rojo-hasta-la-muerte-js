@@ -85,12 +85,34 @@ class GameObject {
       this.currentAnimation = name;
     }
 
+    // Safely flip the currently active animation horizontally based on velocity.x
+    _applyHorizontalFlip() {
+      try {
+        const name = this.currentAnimation;
+        if (!name) return;
+        const sprite = this.spritesAnimated && this.spritesAnimated[name];
+        if (!sprite || !sprite.scale) return;
+        sprite.scale.x = (this.velocity && this.velocity.x < 0) ? -Math.abs(sprite.scale.x) : Math.abs(sprite.scale.x);
+      } catch (e) {
+        console.warn('applyHorizontalFlip failed', e);
+      }
+    }
+
     //Tick: This method tick is executed in every frame.
     tick() {
         //Acceleration
         this.acceleration.x = 0;
         this.acceleration.y = 0;
         
+        // Allow subclasses to perceive the environment (populate FSM state decisions)
+        if (typeof this.perceiveEnvironment === 'function') {
+          try { this.perceiveEnvironment(); } catch (e) { console.error('perceiveEnvironment error', e); }
+        }
+        // If object has a FSM, update it so it can set states/animations and also modify acceleration
+        if (this.fsm && typeof this.fsm.update === 'function') {
+          try { this.fsm.update(this.game?.pixiApp?.ticker?.deltaMS || (1000/60)); } catch (e) { console.error('fsm.update error', e); }
+        }
+
         // Decide acceleration via subclass brain (IA or input)
         this.applyBrain();
         this.limitAcceleration();
@@ -116,6 +138,15 @@ class GameObject {
         this.velocityMagnitude = Math.sqrt(
             this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y
         );
+
+        // Allow subclasses to perceive the environment (populate FSM state decisions)
+        if (typeof this.perceiveEnvironment === 'function') {
+          try { this.perceiveEnvironment(); } catch (e) { console.error('perceiveEnvironment error', e); }
+        }
+        // If object has a FSM, update it so it can set states/animations based on current physics
+        if (this.fsm && typeof this.fsm.update === 'function') {
+          try { this.fsm.update(this.game?.pixiApp?.ticker?.deltaMS || (1000/60)); } catch (e) { console.error('fsm.update error', e); }
+        }
 
         //Bounds
         this._applyBounds();
@@ -161,6 +192,10 @@ class GameObject {
 
     _updateAnimationBasedOnMovement() {
       const speed = this.velocityMagnitude || 0;
+      // If this object has a FSM active, do not override the animation here
+      if (this.fsm && this.fsm.isActive()) {
+        return;
+      }
       const threshold = 0.2; // below this, we consider the object idle
 
       if (speed < threshold) {

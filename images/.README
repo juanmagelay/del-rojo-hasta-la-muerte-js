@@ -1,0 +1,9 @@
+This folder will contain binary image assets used by the game.
+Files expected:
+- logo.png
+- onboarding-1.png
+- onboarding-2.png
+- toilet.png
+- stadium-desktop.png
+
+Binary files will be moved here by a terminal move operation.
