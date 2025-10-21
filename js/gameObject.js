@@ -63,7 +63,7 @@ class GameObject {
         }
         
         //Collision
-        this.collisionRadius = 16;
+        this.collisionRadius = 18;
         this.isSolid = true;
         this.canPushOthers = true;
     }
