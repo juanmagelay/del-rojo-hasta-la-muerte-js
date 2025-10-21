@@ -28,8 +28,9 @@
     <script src="js/gameObject.js"></script>
     <script src="js/hero.js"></script>
     <script src="js/enemy.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/gameMenuOverlay.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/gameMenuOverlay.js"></script>
+    <script src="js/gameWithOverlay.js"></script>
 
   </head>
   <body>
@@ -37,101 +38,7 @@
         <div id="game-canvas-center" style="width:1024px;height:768px;position:relative;z-index:2;"></div>
       </div>
       <script>
-        //Modify Game to support overlay at start and end
-        class GameWithOverlay extends Game {
-          constructor() {
-            super();
-            this.overlay = new GameMenuOverlay(this);
-            this._gameActive = false;
-            this._onboardingActive = false;
-          }
-          startGame() {
-            this._onboardingActive = true;
-            this._gameActive = false;
-            this._enableHeroInput(false);
-            this._enableEnemies(false);
-            this.health = this.maxHealth;
-            this.toiletCount = 10;
-            this._updateHealthBar();
-            this._updateToiletCounter();
-          }
-          restartGame() {
-            // Remove all toilets
-            for (const t of this.toilets) {
-              if (t.sprite && t.sprite.destroy) t.sprite.destroy();
-            }
-            this.toilets = [];
-            this.health = this.maxHealth;
-            this.toiletCount = 10;
-            this.remainingSeconds = 60;
-            this._timerAccumulatorMs = 0;
-            this._updateHealthBar();
-            this._updateToiletCounter();
-            
-            // Reset hero position and state
-            const hero = this._getHero();
-            if (hero && typeof hero.resetToInitialState === 'function') {
-              hero.resetToInitialState();
-            }
-            
-            // Reset enemies to their initial positions
-            const minEnemyDistance = 200;
-            const hx = this.playArea.x + this.playArea.width;
-            const hy = this.playArea.y + this.playArea.height * 0.5;
-            
-            for (let character of this.characters) {
-              if (character instanceof Enemy) {
-                // Generate new position for enemy (same logic as initial spawn)
-                let x, y, dist;
-                do {
-                  x = this.playArea.x + Math.random() * this.playArea.width;
-                  y = this.playArea.y + Math.random() * this.playArea.height;
-                  dist = Math.sqrt((x - hx) ** 2 + (y - hy) ** 2);
-                } while (dist < minEnemyDistance);
-                
-                if (typeof character.resetToInitialState === 'function') {
-                  character.resetToInitialState(x, y);
-                }
-              }
-            }
-            
-            // Start game immediately
-            this._onboardingActive = false;
-            this._gameActive = true;
-            this._enableHeroInput(true);
-            this._enableEnemies(true);
-          }
-          _enableHeroInput(enable) {
-            const hero = this._getHero();
-            if (hero) hero.inputEnabled = enable;
-          }
-          _enableEnemies(enable) {
-            for (const c of this.characters) {
-              if (c instanceof Enemy) c.active = enable;
-            }
-          }
-          gameLoop(time) {
-            if (!this._gameActive) return;
-            super.gameLoop(time);
-            if (this.health <= 0) {
-              this._gameActive = false;
-              this._enableHeroInput(false);
-              this._enableEnemies(false);
-              this.overlay.showGameOver();
-            } else if (this.remainingSeconds <= 0) {
-              this._gameActive = false;
-              this._enableHeroInput(false);
-              this._enableEnemies(false);
-              this.overlay.showWin();
-            }
-          }
-          _finishOnboarding() {
-            this._onboardingActive = false;
-            this._gameActive = true;
-            this._enableHeroInput(true);
-            this._enableEnemies(true);
-          }
-        }
+        // Initialize the game
         const game = new GameWithOverlay();
       </script>
   </body>

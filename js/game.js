@@ -162,6 +162,36 @@ class Game {
 
   _getHero() { return this.characters.find(c => c instanceof Hero) || null; }
 
+  // Reset all characters to initial state
+  resetAllCharacters() {
+    // Reset hero position and state
+    const hero = this._getHero();
+    if (hero && typeof hero.resetToInitialState === 'function') {
+      hero.resetToInitialState();
+    }
+    
+    // Reset enemies to their initial positions
+    const minEnemyDistance = 200;
+    const hx = this.playArea.x + this.playArea.width;
+    const hy = this.playArea.y + this.playArea.height * 0.5;
+    
+    for (let character of this.characters) {
+      if (character instanceof Enemy) {
+        // Generate new position for enemy (same logic as initial spawn)
+        let x, y, dist;
+        do {
+          x = this.playArea.x + Math.random() * this.playArea.width;
+          y = this.playArea.y + Math.random() * this.playArea.height;
+          dist = Math.sqrt((x - hx) ** 2 + (y - hy) ** 2);
+        } while (dist < minEnemyDistance);
+        
+        if (typeof character.resetToInitialState === 'function') {
+          character.resetToInitialState(x, y);
+        }
+      }
+    }
+  }
+
   async placeToilet(worldPosition) {
     if (this.toiletCount <= 0) return;
     this.toiletCount -= 1; this._updateToiletCounter();
