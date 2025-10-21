@@ -137,12 +137,12 @@ class GameMenuOverlay {
     this.overlay.style.width = '1024px';
     this.overlay.style.height = '768px';
     this.title.style.display = 'block';
-    this.title.style.margin = '0 auto 32px auto';
+    this.title.style.margin = '0 auto 16px auto';
     this.title.style.textAlign = 'center';
     this.button.style.display = 'block';
     this.button.style.position = 'static';
     this.button.style.margin = '0 auto';
-    this.button.style.marginTop = '32px';
+    this.button.style.marginTop = '0px';
     this.button.style.zIndex = '10000';
     this.button.style.textAlign = 'center';
     //Insert the button just after the title
@@ -190,7 +190,7 @@ class GameMenuOverlay {
     this.title.style.color = '#fff';
     this.title.style.fontFamily = 'VT323, Arial, sans-serif';
     this.title.style.fontSize = '3rem';
-    this.title.style.marginBottom = '32px';
+    this.title.style.marginBottom = '16px';
     this.overlay.appendChild(this.title);
 
     this.button = document.createElement('button');
@@ -273,12 +273,12 @@ class GameMenuOverlay {
     this.overlay.style.width = '1024px';
     this.overlay.style.height = '768px';
     this.title.style.display = 'block';
-    this.title.style.margin = '0 auto 32px auto';
+    this.title.style.margin = '0 auto 16px auto';
     this.title.style.textAlign = 'center';
     this.button.style.display = 'block';
     this.button.style.position = 'static';
     this.button.style.margin = '0 auto';
-    this.button.style.marginTop = '32px';
+    this.button.style.marginTop = '0px';
     this.button.style.zIndex = '10000';
     this.button.style.textAlign = 'center';
     //Insert the button just after the title

@@ -270,4 +270,31 @@ class Enemy extends GameObject {
       // Otherwise wander
       this.fsm.setState('wander');
     }
+
+    // Method to reset enemy to initial state when game restarts
+    resetToInitialState(initialX, initialY) {
+        // Reset position to initial spawn position
+        this.position.x = initialX;
+        this.position.y = initialY;
+        
+        // Reset velocity and acceleration
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        this.acceleration.x = 0;
+        this.acceleration.y = 0;
+        
+        // Reset Z index to normal
+        this.container.zIndex = Math.round(this.position.y);
+        
+        // Reset FSM to wander state
+        if (this.fsm) {
+            this.fsm.setState('wander');
+        }
+        
+        // Reset target
+        this.target = null;
+        
+        // Reset active state
+        this.active = true;
+    }
 }

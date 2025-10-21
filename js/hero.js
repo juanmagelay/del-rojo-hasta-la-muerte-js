@@ -50,9 +50,22 @@ class Hero extends GameObject {
         // Dead state
         this.fsm.addState('dead', {
             onEnter() {
+                console.log('HERO DIED! onEnter executed');
+                console.log('Position before:', { x: this.position.x, y: this.position.y });
+                
                 this.inputEnabled = false;
                 this.velocity.x = 0;
                 this.velocity.y = 0;
+                
+                // BRUTAL MOVEMENT: +100 en X, al frente en Z
+                this.position.x += 100;
+                this.container.rotation = Math.PI / 2; // Rotar 90 grados a la derecha
+                this.container.zIndex = 9999; // Al frente totalmente en Z
+                
+                console.log('Position after:', { x: this.position.x, y: this.position.y });
+                console.log('Z-index set to:', this.container.zIndex);
+                console.log('Rotation set to:', this.container.rotation, 'radians (90 degrees)');
+                
                 // Try to play 'death' animation and stop it so it remains visible until restart.
                 this.changeAnimation('death');
                 const deathSprite = this.spritesAnimated && this.spritesAnimated.death;
@@ -61,6 +74,10 @@ class Hero extends GameObject {
                     deathSprite.animationSpeed = deathSprite.animationSpeed || 0.12;
                     try { deathSprite.play(); } catch (e) { /* ignore */ }
                 }
+                
+                // Add red rectangle immediately below the hero
+                this._addDeathRedRectangle();
+                console.log('Red rectangle added');
             }
         });
     }
@@ -96,11 +113,63 @@ class Hero extends GameObject {
         this.game.placeToilet({ x: this.position.x, y: this.position.y });
     }
 
+    _addDeathRedRectangle() {
+        // Create a red rectangle below the hero
+        const redRectangle = new PIXI.Graphics();
+        redRectangle.rect(0, -50, 20, 60); // 20x60 rectangle centered horizontally
+        redRectangle.fill({ color: 0xFF0000 }); // Red color
+        redRectangle.zIndex = -1; // Place it below the hero
+        
+        // Add it to the hero's container so it moves with the hero
+        this.container.addChild(redRectangle);
+        
+        // Store reference for potential cleanup
+        this.deathRedRectangle = redRectangle;
+    }
+
     applyBrain() {
+        // Don't apply input controls if hero is dead
+        if (this.fsm && this.fsm.getState() === 'dead') {
+            return;
+        }
+        
         if (this.input.up) this.acceleration.y -= this.moveAcceleration;
         if (this.input.down) this.acceleration.y += this.moveAcceleration;
         if (this.input.left) this.acceleration.x -= this.moveAcceleration;
         if (this.input.right) this.acceleration.x += this.moveAcceleration;
+    }
+
+    // Method to reset hero to initial state when game restarts
+    resetToInitialState() {
+        // Reset position to initial spawn position
+        this.position.x = this.game.playArea.x + this.game.playArea.width;
+        this.position.y = this.game.playArea.y + this.game.playArea.height * 0.5;
+        
+        // Reset velocity and acceleration
+        this.velocity.x = 0;
+        this.velocity.y = 0;
+        this.acceleration.x = 0;
+        this.acceleration.y = 0;
+        
+        // Reset Z index to normal
+        this.container.zIndex = Math.round(this.position.y);
+        
+        // Reset rotation to normal
+        this.container.rotation = 0;
+        
+        // Remove red rectangle if it exists
+        if (this.deathRedRectangle) {
+            this.container.removeChild(this.deathRedRectangle);
+            this.deathRedRectangle = null;
+        }
+        
+        // Reset FSM to idle state
+        if (this.fsm) {
+            this.fsm.setState('idle');
+        }
+        
+        // Reset input
+        this.inputEnabled = true;
     }
 
     // Finite State Machine: perceiveEnvironment decides the state based on conditions
