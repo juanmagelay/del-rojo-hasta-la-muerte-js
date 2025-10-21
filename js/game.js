@@ -56,7 +56,9 @@ class Game {
     this.uiLayer.name = "uiLayer";
     const enemySheet = await PIXI.Assets.load("spritesheets/UDeChile.json");
     const heroSheet  = await PIXI.Assets.load("spritesheets/independiente.json");
-    const makeSpritesheetData = (sheet) => ({ animations: { walk: sheet.animations.walk, back: sheet.animations.back, front: sheet.animations.front, idle: sheet.animations.idle } });
+    
+    // Keep all animations provided by the spritesheet (so optional keys like "death" are preserved)
+    const makeSpritesheetData = (sheet) => ({ animations: sheet.animations || {} });
     const enemySheetData = makeSpritesheetData(enemySheet);
     const heroSheetData = makeSpritesheetData(heroSheet);
     const hx = this.playArea.x + this.playArea.width;
@@ -105,7 +107,7 @@ class Game {
     }
     for (let aCharacter of this.characters) {
       aCharacter.tick(); aCharacter.render();
-      if (Math.floor(time) % 60 === 0) console.log(`Character ${aCharacter.id}: pos(${Math.round(aCharacter.position.x)}, ${Math.round(aCharacter.position.y)})`);
+  // position logging removed to reduce console noise
       if (aCharacter instanceof Enemy) {
         const enemy = aCharacter; const target = enemy.target;
         if (target) {
@@ -142,7 +144,21 @@ class Game {
 
   _updateToiletCounter() { if (this.toiletCountText) this.toiletCountText.text = `x ${this.toiletCount}`; }
 
-  _applyHeroDamage(amount) { this.health = Math.max(0, this.health - amount); this._updateHealthBar(); }
+  _applyHeroDamage(amount) {
+    this.health = Math.max(0, this.health - amount);
+    this._updateHealthBar();
+    // Log concise info: remaining health and current hero animation (if present)
+    const hero = this._getHero();
+    const anim = hero && hero.currentAnimation ? hero.currentAnimation : '(no-anim)';
+    console.log(`_applyHeroDamage: health=${this.health.toFixed(2)}, heroAnim=${anim}`);
+    // If hero reaches zero life, force FSM into 'dead' and attempt death animation immediately
+    if (this.health <= 0 && hero) {
+      try {
+        if (hero.fsm && typeof hero.fsm.setState === 'function') hero.fsm.setState('dead');
+        if (typeof hero.changeAnimation === 'function') hero.changeAnimation('death');
+      } catch (e) { /* ignore */ }
+    }
+  }
 
   _getHero() { return this.characters.find(c => c instanceof Hero) || null; }
 

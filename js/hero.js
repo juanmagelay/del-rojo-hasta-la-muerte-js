@@ -49,7 +49,19 @@ class Hero extends GameObject {
         
         // Dead state
         this.fsm.addState('dead', {
-            onEnter() { this.inputEnabled = false; this.velocity.x = 0; this.velocity.y = 0; this.changeAnimation('death' in this.spritesAnimated ? 'death' : 'idle'); }
+            onEnter() {
+                this.inputEnabled = false;
+                this.velocity.x = 0;
+                this.velocity.y = 0;
+                // Try to play 'death' animation and stop it so it remains visible until restart.
+                this.changeAnimation('death');
+                const deathSprite = this.spritesAnimated && this.spritesAnimated.death;
+                if (deathSprite) {
+                    deathSprite.loop = false; // play once and then stay on last frame
+                    deathSprite.animationSpeed = deathSprite.animationSpeed || 0.12;
+                    try { deathSprite.play(); } catch (e) { /* ignore */ }
+                }
+            }
         });
     }
 
@@ -93,12 +105,15 @@ class Hero extends GameObject {
 
     // Finite State Machine: perceiveEnvironment decides the state based on conditions
     perceiveEnvironment() {
-        // Decide state and delegate to FSM
         const isDead = this.game && typeof this.game.health === 'number' && this.game.health <= 0;
-        if (isDead) { this.fsm.setState('dead'); return; }
+        if (isDead) {
+            this.fsm.setState('dead');
+            return;
+        }
         const speed = this.velocity && Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y) || 0;
         const movingThreshold = 0.2;
         if (speed <= movingThreshold) { this.fsm.setState('idle'); return; }
         this.fsm.setState('walk');
+
     }
 }
