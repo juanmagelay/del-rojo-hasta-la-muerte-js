@@ -123,32 +123,17 @@ class GameMenuOverlay {
     }
   }
   showWin() {
-  // Ocultar logo si existe
-  if (this._logoImg) this._logoImg.style.display = 'none';
+    // Hide logo if it exists
+    if (this._logoImg) this._logoImg.style.display = 'none';
     this._resetOverlayLayout();
     this.title.textContent = 'Ganaste';
     this.button.textContent = 'Volver a jugar';
-    this._resetOverlayLayout();
-    this.overlay.style.display = 'flex';
-    this.overlay.style.flexDirection = 'column';
-    this.overlay.style.alignItems = 'center';
-    this.overlay.style.justifyContent = 'center';
-    this.overlay.style.zIndex = '9999';
-    this.overlay.style.width = '1024px';
-    this.overlay.style.height = '768px';
-    this.title.style.display = 'block';
-    this.title.style.margin = '0 auto 16px auto';
-    this.title.style.textAlign = 'center';
-    this.button.style.display = 'block';
-    this.button.style.position = 'static';
-    this.button.style.margin = '0 auto';
-    this.button.style.marginTop = '0px';
-    this.button.style.zIndex = '10000';
-    this.button.style.textAlign = 'center';
-    //Insert the button just after the title
-    if (this.title.nextSibling !== this.button) {
-      this.overlay.insertBefore(this.button, this.title.nextSibling);
-    }
+    
+    // Use common setup methods
+    this._setupGameEndOverlay();
+    this._setupGameEndTitle();
+    this._setupGameEndButton();
+    
     this.button.onclick = () => {
       this.overlay.style.display = 'none';
       this.game.restartGame();
@@ -162,9 +147,9 @@ class GameMenuOverlay {
   }
 
   _createOverlay() {
-    // Busca el contenedor centrado del juego
+    // Look for the centered game container
     const centerDiv = document.getElementById('game-canvas-center');
-    // Overlay absoluto dentro del contenedor de 1024x768
+    // Absolute overlay inside the 1024x768 container
     this.overlay = document.createElement('div');
     this.overlay.id = 'game-menu-overlay';
     Object.assign(this.overlay.style, {
@@ -215,7 +200,7 @@ class GameMenuOverlay {
     //Logo only for Start Screen
     if (!this._logoImg) {
       this._logoImg = document.createElement('img');
-  this._logoImg.src = 'images/logo.png';
+      this._logoImg.src = 'images/logo.png';
       this._logoImg.alt = 'Logo';
       this._logoImg.style.display = 'block';
       this._logoImg.style.margin = '0 auto 20px auto';
@@ -228,9 +213,9 @@ class GameMenuOverlay {
     } else {
       this.overlay.insertBefore(this._logoImg, this.button);
     }
-    //Detect if el jugador viene de "Volver a jugar"
+    //Detect if the player comes from "Play again" action (Reset)
     if (this.game._justRestarted) {
-      //Ocultar logo en otros estados
+      //Hide logo in other states
       if (this._logoImg) this._logoImg.style.display = 'none';
       //Hide onboarding and start game directly
       if (this._onboardingColumns) this._onboardingColumns.style.display = 'none';
@@ -244,7 +229,7 @@ class GameMenuOverlay {
         this.game._finishOnboarding();
       };
     } else {
-      //Mostrar logo solo en pantalla de inicio
+      //Show logo only on start screen
       if (this._logoImg) this._logoImg.style.display = 'block';
       //Reset onboarding state and columns
       if (this._onboardingColumns) this._onboardingColumns.style.display = '';
@@ -259,32 +244,17 @@ class GameMenuOverlay {
   }
 
   showGameOver() {
-  // Ocultar logo si existe
-  if (this._logoImg) this._logoImg.style.display = 'none';
+    // Hide logo if it exists
+    if (this._logoImg) this._logoImg.style.display = 'none';
     this._resetOverlayLayout();
     this.title.textContent = 'Perdiste';
     this.button.textContent = 'Volver a jugar';
-    this._resetOverlayLayout();
-    this.overlay.style.display = 'flex';
-    this.overlay.style.flexDirection = 'column';
-    this.overlay.style.alignItems = 'center';
-    this.overlay.style.justifyContent = 'center';
-    this.overlay.style.zIndex = '9999';
-    this.overlay.style.width = '1024px';
-    this.overlay.style.height = '768px';
-    this.title.style.display = 'block';
-    this.title.style.margin = '0 auto 16px auto';
-    this.title.style.textAlign = 'center';
-    this.button.style.display = 'block';
-    this.button.style.position = 'static';
-    this.button.style.margin = '0 auto';
-    this.button.style.marginTop = '0px';
-    this.button.style.zIndex = '10000';
-    this.button.style.textAlign = 'center';
-    //Insert the button just after the title
-    if (this.title.nextSibling !== this.button) {
-      this.overlay.insertBefore(this.button, this.title.nextSibling);
-    }
+    
+    // Use common setup methods
+    this._setupGameEndOverlay();
+    this._setupGameEndTitle();
+    this._setupGameEndButton();
+    
     this.button.onclick = () => {
       this.overlay.style.display = 'none';
       this.game.restartGame();
@@ -307,5 +277,38 @@ class GameMenuOverlay {
         e.stopImmediatePropagation();
       }
     }, true);
+  }
+
+  // Common overlay setup for game over and win screens
+  _setupGameEndOverlay() {
+    this.overlay.style.display = 'flex';
+    this.overlay.style.flexDirection = 'column';
+    this.overlay.style.alignItems = 'center';
+    this.overlay.style.justifyContent = 'center';
+    this.overlay.style.zIndex = '9999';
+    this.overlay.style.width = '1024px';
+    this.overlay.style.height = '768px';
+  }
+
+  // Common title setup for game over and win screens
+  _setupGameEndTitle() {
+    this.title.style.display = 'block';
+    this.title.style.margin = '0 auto 16px auto';
+    this.title.style.textAlign = 'center';
+  }
+
+  // Common button setup for game over and win screens
+  _setupGameEndButton() {
+    this.button.style.display = 'block';
+    this.button.style.position = 'static';
+    this.button.style.margin = '0 auto';
+    this.button.style.marginTop = '0px';
+    this.button.style.zIndex = '10000';
+    this.button.style.textAlign = 'center';
+    
+    // Insert the button just after the title
+    if (this.title.nextSibling !== this.button) {
+      this.overlay.insertBefore(this.button, this.title.nextSibling);
+    }
   }
 }
