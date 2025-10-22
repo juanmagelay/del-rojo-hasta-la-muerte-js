@@ -35,25 +35,32 @@ class Game {
   async initPIXI() {
     this.pixiApp = new PIXI.Application();
     const pixiOptions = {
-      background: "#1099bb",
+      background: COLORS.generalBackground, 
       width: this.width,
       height: this.height,
       antialias: false,
       SCALE_MODE: PIXI.SCALE_MODES.NEAREST
     };
+   
     await this.pixiApp.init(pixiOptions);
+    
     const centerDiv = document.getElementById('game-canvas-center');
     if (centerDiv) centerDiv.appendChild(this.pixiApp.canvas);
+    
     this.worldContainer = new PIXI.Container();
     this.worldContainer.name = "worldContainer";
     this.pixiApp.stage.addChild(this.worldContainer);
     this.camera = new Camera(this.width, this.height, this.worldWidth, this.worldHeight);
+    
     const bgTexture = await PIXI.Assets.load("images/stadium-desktop.png");
     const background = new PIXI.Sprite(bgTexture);
+    
     background.x = 0; background.y = 0; background.width = this.worldWidth; background.height = this.worldHeight;
+    
     this.worldContainer.addChild(background);
     this.uiLayer = new PIXI.Container();
     this.uiLayer.name = "uiLayer";
+    
     const enemySheet = await PIXI.Assets.load("spritesheets/UDeChile.json");
     const heroSheet  = await PIXI.Assets.load("spritesheets/independiente.json");
     
@@ -124,34 +131,153 @@ class Game {
   }
 
   async _createHud() {
+    
     this.pixiApp.stage.addChild(this.uiLayer);
-    const panelWidth = 140; const panelHeight = 44; const marginTop = 10;
-    this.hudContainer = new PIXI.Container(); this.hudContainer.x = Math.round((this.width - panelWidth) / 2); this.hudContainer.y = marginTop;
-    const panel = new PIXI.Graphics(); panel.roundRect(0, 0, panelWidth, panelHeight, 6); panel.fill({ color: 0x000000 }); panel.stroke({ color: 0xCCCCCC, width: 2 }); this.hudContainer.addChild(panel);
-    this.timerText = new PIXI.Text("1:00", { fontFamily: "VT323, Arial, sans-serif", fontSize: 24, fill: 0xFF0000, align: "center", letterSpacing: 2 }); this.timerText.anchor.set(0.5, 0.5); this.timerText.x = Math.round(panelWidth / 2); this.timerText.y = Math.round(panelHeight / 2); this.timerText.scale.set(2); this.hudContainer.addChild(this.timerText);
-    this._createHealthBar(); await this._createToiletCounter(); this.uiLayer.addChild(this.hudContainer);
+
+    // Timer Panel - using LAYOUT constants
+    
+    const timerLayout = LAYOUT.timerPanel;
+    this.hudContainer = new PIXI.Container();
+    this.hudContainer.x = Math.round((this.width - timerLayout.width) / 2);
+    this.hudContainer.y = timerLayout.marginTop;
+    
+    const panel = new PIXI.Graphics(); 
+    panel.roundRect(0, 0, timerLayout.width, timerLayout.height, timerLayout.borderRadius);
+    panel.fill({ color: timerLayout.backgroundColor });
+    panel.stroke({ color: timerLayout.borderColor, width: timerLayout.borderWidth });
+    
+    this.hudContainer.addChild(panel);
+    
+    // Timer Text - using TEXT_STYLES
+    this.timerText = new PIXI.Text("1:00", TEXT_STYLES.hudTimer);
+    this.timerText.anchor.set(0.5, 0.5);
+    this.timerText.x = Math.round(timerLayout.width / 2);
+    this.timerText.y = Math.round(timerLayout.height / 2);
+    this.timerText.scale.set(TEXT_SCALES.hudTimer);
+    this.hudContainer.addChild(this.timerText);
+    
+    this._createHealthBar(); 
+    await this._createToiletCounter(); 
+    this.uiLayer.addChild(this.hudContainer);
   }
 
-  _updateHudTimer(deltaMs) { if (this.remainingSeconds <= 0) return; this._timerAccumulatorMs += deltaMs; while (this._timerAccumulatorMs >= 1000 && this.remainingSeconds > 0) { this._timerAccumulatorMs -= 1000; this.remainingSeconds -= 1; this._renderTimerText(); } }
+  _updateHudTimer(deltaMs) { 
+    if (this.remainingSeconds <= 0) return; 
+    this._timerAccumulatorMs += deltaMs; 
+    while (this._timerAccumulatorMs >= 1000 && this.remainingSeconds > 0) { 
+      this._timerAccumulatorMs -= 1000; 
+      this.remainingSeconds -= 1; 
+      this._renderTimerText(); 
+    } 
+  }
 
-  _renderTimerText() { const minutes = Math.floor(this.remainingSeconds / 60); const seconds = this.remainingSeconds % 60; const text = `${minutes}:${seconds.toString().padStart(2, "0")}`; if (this.timerText) this.timerText.text = text; }
+  _renderTimerText() { 
+    const minutes = Math.floor(this.remainingSeconds / 60); 
+    const seconds = this.remainingSeconds % 60; 
+    const text = `${minutes}:${seconds.toString().padStart(2, "0")}`; 
+    if (this.timerText) this.timerText.text = text; 
+  }
 
-  _createHealthBar() { const width = 240; const height = 40; const margin = 10; const container = new PIXI.Container(); container.x = margin; container.y = margin; const bg = new PIXI.Graphics(); bg.roundRect(0, 0, width, height, 4); bg.fill({ color: 0x000000 }); bg.stroke({ color: 0xCCCCCC, width: 2 }); container.addChild(bg); this.healthBarFill = new PIXI.Graphics(); this.healthBarFill.roundRect(2, 2, width - 4, height - 4, 2); this.healthBarFill.fill({ color: 0xD32F2F }); container.addChild(this.healthBarFill); this.uiLayer.addChild(container); this._updateHealthBar(); }
+  _createHealthBar() {
+    // Using LAYOUT constants
+    const healthLayout = LAYOUT.healthBar;
+    
+    const container = new PIXI.Container();
+    container.x = healthLayout.margin;
+    container.y = healthLayout.margin;
+    
+    const bg = new PIXI.Graphics();
+    bg.roundRect(0, 0, healthLayout.width, healthLayout.height, healthLayout.borderRadius);
+    bg.fill({ color: healthLayout.backgroundColor });
+    bg.stroke({ color: healthLayout.borderColor, width: healthLayout.borderWidth });
+    container.addChild(bg);
+    
+    this.healthBarFill = new PIXI.Graphics();
+    this.healthBarFill.roundRect(
+      healthLayout.fillPadding, 
+      healthLayout.fillPadding, 
+      healthLayout.width - (healthLayout.fillPadding * 2), 
+      healthLayout.height - (healthLayout.fillPadding * 2), 
+      healthLayout.borderRadius - 1
+    );
+    this.healthBarFill.fill({ color: healthLayout.fillColor });
+    container.addChild(this.healthBarFill);
+    
+    this.uiLayer.addChild(container);
+    this._updateHealthBar();
+  }
 
-  _updateHealthBar() { if (!this.healthBarFill) return; const width = 240 - 4; const height = 40 - 4; const ratio = Math.max(0, Math.min(1, this.health / this.maxHealth)); this.healthBarFill.clear(); this.healthBarFill.roundRect(2, 2, Math.max(1, Math.round(width * ratio)), height, 2); this.healthBarFill.fill({ color: 0xD32F2F }); }
+  _updateHealthBar() {
+    if (!this.healthBarFill) return;
+    
+    const healthLayout = LAYOUT.healthBar;
+    const width = healthLayout.width - (healthLayout.fillPadding * 2);
+    const height = healthLayout.height - (healthLayout.fillPadding * 2);
+    const ratio = Math.max(0, Math.min(1, this.health / this.maxHealth));
+    
+    this.healthBarFill.clear();
+    this.healthBarFill.roundRect(
+      healthLayout.fillPadding, 
+      healthLayout.fillPadding, 
+      Math.max(1, Math.round(width * ratio)), 
+      height, 
+      healthLayout.borderRadius - 1
+    );
+    this.healthBarFill.fill({ color: healthLayout.fillColor });
+  }
 
-  async _createToiletCounter() { const panelWidth = 120; const panelHeight = 40; const marginTop = 10; const container = new PIXI.Container(); container.x = this.width - panelWidth - 10; container.y = marginTop; const panel = new PIXI.Graphics(); panel.roundRect(0, 0, panelWidth, panelHeight, 6); panel.fill({ color: 0x000000 }); panel.stroke({ color: 0xCCCCCC, width: 2 }); container.addChild(panel); const row = new PIXI.Container(); row.y = panelHeight / 2; container.addChild(row); try { const tex = await PIXI.Assets.load("images/toilet.png"); this.toiletIconSprite = new PIXI.Sprite(tex); this.toiletIconSprite.scale.set(0.25); this.toiletIconSprite.anchor.set(0, 0.5); row.addChild(this.toiletIconSprite); } catch (e) { const placeholder = new PIXI.Graphics(); placeholder.roundRect(0, 0, 32, 32, 4); placeholder.fill({ color: 0x444444 }); placeholder.pivot.y = 16; row.addChild(placeholder); } this.toiletCountText = new PIXI.Text(`x ${this.toiletCount}`, { fontFamily: "VT323, Arial, sans-serif", fontSize: 18, fill: 0xFFFFFF, align: "left", letterSpacing: 1 }); this.toiletCountText.scale.set(2); this.toiletCountText.anchor.set(0, 0.5); this.toiletCountText.x = 44; row.addChild(this.toiletCountText); this.uiLayer.addChild(container); }
+  async _createToiletCounter() {
+    // Using LAYOUT constants
+    const toiletLayout = LAYOUT.toiletPanel;
+    
+    const container = new PIXI.Container();
+    container.x = this.width - toiletLayout.width - toiletLayout.marginRight;
+    container.y = toiletLayout.marginTop;
+    
+    const panel = new PIXI.Graphics();
+    panel.roundRect(0, 0, toiletLayout.width, toiletLayout.height, toiletLayout.borderRadius);
+    panel.fill({ color: toiletLayout.backgroundColor });
+    panel.stroke({ color: toiletLayout.borderColor, width: toiletLayout.borderWidth });
+    container.addChild(panel);
+    
+    const row = new PIXI.Container();
+    row.y = toiletLayout.height / 2;
+    container.addChild(row);
+    
+    try {
+      const tex = await PIXI.Assets.load("images/toilet.png");
+      this.toiletIconSprite = new PIXI.Sprite(tex);
+      this.toiletIconSprite.scale.set(toiletLayout.iconScale);
+      this.toiletIconSprite.anchor.set(0, 0.5);
+      row.addChild(this.toiletIconSprite);
+    } catch (e) {
+      const placeholder = new PIXI.Graphics();
+      placeholder.roundRect(0, 0, 32, 32, 4);
+      placeholder.fill({ color: 0x444444 });
+      placeholder.pivot.y = 16;
+      row.addChild(placeholder);
+    }
+    
+    // Using TEXT_STYLES
+    this.toiletCountText = new PIXI.Text(`x ${this.toiletCount}`, TEXT_STYLES.toiletCounter);
+    this.toiletCountText.scale.set(TEXT_SCALES.toiletCounter);
+    this.toiletCountText.anchor.set(0, 0.5);
+    this.toiletCountText.x = toiletLayout.iconOffsetX;
+    row.addChild(this.toiletCountText);
+    
+    this.uiLayer.addChild(container);
+  }
 
-  _updateToiletCounter() { if (this.toiletCountText) this.toiletCountText.text = `x ${this.toiletCount}`; }
+  _updateToiletCounter() { 
+    if (this.toiletCountText) this.toiletCountText.text = `x ${this.toiletCount}`; 
+  }
 
   _applyHeroDamage(amount) {
     this.health = Math.max(0, this.health - amount);
     this._updateHealthBar();
-    // Log concise info: remaining health and current hero animation (if present)
     const hero = this._getHero();
     const anim = hero && hero.currentAnimation ? hero.currentAnimation : '(no-anim)';
     console.log(`_applyHeroDamage: health=${this.health.toFixed(2)}, heroAnim=${anim}`);
-    // If hero reaches zero life, force FSM into 'dead' and attempt death animation immediately
     if (this.health <= 0 && hero) {
       try {
         if (hero.fsm && typeof hero.fsm.setState === 'function') hero.fsm.setState('dead');
@@ -160,24 +286,22 @@ class Game {
     }
   }
 
-  _getHero() { return this.characters.find(c => c instanceof Hero) || null; }
+  _getHero() { 
+    return this.characters.find(c => c instanceof Hero) || null; 
+  }
 
-  // Reset all characters to initial state
   resetAllCharacters() {
-    // Reset hero position and state
     const hero = this._getHero();
     if (hero && typeof hero.resetToInitialState === 'function') {
       hero.resetToInitialState();
     }
     
-    // Reset enemies to their initial positions
     const minEnemyDistance = 200;
     const hx = this.playArea.x + this.playArea.width;
     const hy = this.playArea.y + this.playArea.height * 0.5;
     
     for (let character of this.characters) {
       if (character instanceof Enemy) {
-        // Generate new position for enemy (same logic as initial spawn)
         let x, y, dist;
         do {
           x = this.playArea.x + Math.random() * this.playArea.width;
@@ -194,13 +318,44 @@ class Game {
 
   async placeToilet(worldPosition) {
     if (this.toiletCount <= 0) return;
-    this.toiletCount -= 1; this._updateToiletCounter();
+    this.toiletCount -= 1; 
+    this._updateToiletCounter();
+    
     let sprite = null;
-    try { const tex = await PIXI.Assets.load("images/toilet.png"); sprite = new PIXI.Sprite(tex); sprite.anchor.set(0.5, 1); sprite.scale.set(0.5); } catch (e) { const g = new PIXI.Graphics(); g.roundRect(-12, -32, 24, 32, 4); g.fill({ color: 0x8888FF }); sprite = g; }
-    sprite.x = worldPosition.x; sprite.y = worldPosition.y; this.worldContainer.addChild(sprite);
-    const toilet = { isToilet: true, position: { x: worldPosition.x, y: worldPosition.y }, hp: 100, maxHp: 100, destroyed: false, sprite: sprite, collisionRadius: 20 };
+    try {
+      const tex = await PIXI.Assets.load("images/toilet.png");
+      sprite = new PIXI.Sprite(tex);
+      sprite.anchor.set(0.5, 1);
+      sprite.scale.set(0.5);
+    } catch (e) {
+      const g = new PIXI.Graphics();
+      g.roundRect(-12, -32, 24, 32, 4);
+      g.fill({ color: 0x8888FF });
+      sprite = g;
+    }
+    
+    sprite.x = worldPosition.x;
+    sprite.y = worldPosition.y;
+    this.worldContainer.addChild(sprite);
+    
+    const toilet = {
+      isToilet: true,
+      position: { x: worldPosition.x, y: worldPosition.y },
+      hp: 100,
+      maxHp: 100,
+      destroyed: false,
+      sprite: sprite,
+      collisionRadius: 20
+    };
     this.toilets.push(toilet);
   }
 
-  _damageToilet(toilet, amount) { if (!toilet || toilet.destroyed) return; toilet.hp -= amount; if (toilet.hp <= 0) { toilet.destroyed = true; if (toilet.sprite && toilet.sprite.destroy) toilet.sprite.destroy(); } }
+  _damageToilet(toilet, amount) {
+    if (!toilet || toilet.destroyed) return;
+    toilet.hp -= amount;
+    if (toilet.hp <= 0) {
+      toilet.destroyed = true;
+      if (toilet.sprite && toilet.sprite.destroy) toilet.sprite.destroy();
+    }
+  }
 }

@@ -15,6 +15,7 @@ class GameMenuOverlay {
 
   _createOverlay() {
     const centerDiv = document.getElementById('game-canvas-center');
+    const overlayLayout = LAYOUT.overlay;
     
     // Create main overlay container
     this.overlay = document.createElement('div');
@@ -23,16 +24,16 @@ class GameMenuOverlay {
       position: 'absolute',
       top: 0,
       left: 0,
-      width: '1024px',
-      height: '768px',
+      width: overlayLayout.width,
+      height: overlayLayout.height,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 9999,
-      background: 'rgba(0,0,0,0.4)',
-      boxShadow: '0 0 32px 0 rgba(0,0,0,0.7)',
-      borderRadius: '18px',
+      zIndex: overlayLayout.zIndex,
+      background: overlayLayout.backgroundColor,
+      boxShadow: overlayLayout.boxShadow,
+      borderRadius: overlayLayout.borderRadius,
       overflow: 'hidden',
       pointerEvents: 'auto'
     });
@@ -40,27 +41,12 @@ class GameMenuOverlay {
 
     // Create title element
     this.title = document.createElement('h1');
-    Object.assign(this.title.style, {
-      color: '#fff',
-      fontFamily: 'VT323, Arial, sans-serif',
-      fontSize: '3rem',
-      marginBottom: '16px'
-    });
+    Object.assign(this.title.style, TEXT_STYLES.overlayTitle);
     this.overlay.appendChild(this.title);
 
     // Create button element
     this.button = document.createElement('button');
-    Object.assign(this.button.style, {
-      fontSize: '2rem',
-      fontFamily: 'VT323, Arial, sans-serif',
-      padding: '16px 48px',
-      borderRadius: '12px',
-      border: 'none',
-      background: '#382F28',
-      color: '#E3C3A8',
-      cursor: 'pointer',
-      marginTop: '16px'
-    });
+    Object.assign(this.button.style, TEXT_STYLES.overlayButton);
     this.overlay.appendChild(this.button);
   }
 
@@ -137,14 +123,19 @@ class GameMenuOverlay {
   }
 
   _createOnboardingLayoutIfNeeded() {
+    const colLayout = LAYOUT.onboardingColumns;
+    const imgColLayout = LAYOUT.onboardingImgCol;
+    const imgLayout = LAYOUT.onboardingImg;
+    const textColLayout = LAYOUT.onboardingTextCol;
+    
     if (!this._onboardingColumns) {
       this._onboardingColumns = document.createElement('div');
       Object.assign(this._onboardingColumns.style, {
         display: 'flex',
         flexDirection: 'row',
-        width: '1024px',
-        maxWidth: '1024px',
-        gap: '0px'
+        width: colLayout.width,
+        maxWidth: colLayout.maxWidth,
+        gap: colLayout.gap
       });
       this.overlay.insertBefore(this._onboardingColumns, this.button);
     }
@@ -152,9 +143,9 @@ class GameMenuOverlay {
     if (!this._onboardingImgCol) {
       this._onboardingImgCol = document.createElement('div');
       Object.assign(this._onboardingImgCol.style, {
-        width: '512px',
-        paddingLeft: '8px',
-        paddingRight: '8px',
+        width: imgColLayout.width,
+        paddingLeft: imgColLayout.padding,
+        paddingRight: imgColLayout.padding,
         boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
@@ -166,10 +157,10 @@ class GameMenuOverlay {
       this._onboardingImg = document.createElement('img');
       Object.assign(this._onboardingImg.style, {
         width: '100%',
-        maxWidth: '512px',
+        maxWidth: imgLayout.maxWidth,
         height: 'auto',
         display: 'block',
-        borderRadius: '12px'
+        borderRadius: imgLayout.borderRadius
       });
     }
 
@@ -178,9 +169,9 @@ class GameMenuOverlay {
       Object.assign(this._onboardingTextCol.style, {
         display: 'flex',
         flexDirection: 'column',
-        width: '512px',
-        paddingLeft: '8px',
-        paddingRight: '8px',
+        width: textColLayout.width,
+        paddingLeft: textColLayout.padding,
+        paddingRight: textColLayout.padding,
         boxSizing: 'border-box',
         justifyContent: 'center',
         alignItems: 'flex-start'
@@ -189,15 +180,7 @@ class GameMenuOverlay {
 
     if (!this._onboardingText) {
       this._onboardingText = document.createElement('div');
-      Object.assign(this._onboardingText.style, {
-        width: '100%',
-        color: '#E3C3A8',
-        fontFamily: 'VT323, Arial, sans-serif',
-        fontSize: '1.4rem',
-        whiteSpace: 'pre-line',
-        textAlign: 'left',
-        marginBottom: '32px'
-      });
+      Object.assign(this._onboardingText.style, TEXT_STYLES.onboardingText);
     }
   }
 
@@ -261,11 +244,12 @@ class GameMenuOverlay {
   
   _createLogoIfNeeded() {
     if (!this._logoImg) {
+      const logoLayout = LAYOUT.logo;
       this._logoImg = document.createElement('img');
       Object.assign(this._logoImg.style, {
         display: 'block',
-        margin: '0 auto 20px auto',
-        width: '384px',
+        margin: logoLayout.margin,
+        width: logoLayout.width,
         height: 'auto'
       });
       this._logoImg.src = 'images/logo.png';
@@ -324,14 +308,15 @@ class GameMenuOverlay {
   }
 
   _setupGameEndOverlay() {
+    const overlayLayout = LAYOUT.overlay;
     Object.assign(this.overlay.style, {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: '9999',
-      width: '1024px',
-      height: '768px'
+      zIndex: overlayLayout.zIndex,
+      width: overlayLayout.width,
+      height: overlayLayout.height
     });
   }
 
