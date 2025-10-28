@@ -62,13 +62,6 @@ class Hero extends GameObject {
                 this.isJumping = true;
                 this.jumpStartY = this.position.y;
                 this.jumpElapsed = 0;
-                
-                // Usar animación de salto si existe, sino mantener la actual
-                if (this.spritesAnimated.jump) {
-                    this.changeAnimation('jump');
-                } else if (this.spritesAnimated.walk) {
-                    this.changeAnimation('walk');
-                }
             },
             onUpdate(deltaTime) {
                 if (!this.isJumping) return;
@@ -76,16 +69,16 @@ class Hero extends GameObject {
                 this.jumpElapsed += deltaTime;
                 const progress = Math.min(this.jumpElapsed / this.jumpDuration, 1);
                 
-                // Parábola para el salto (sube y baja suavemente)
-                // Usando sin para un movimiento más natural
+                // Parabola for jumping (goes up and down smoothly)
+                // Using sin for a more natural movement
                 const jumpCurve = Math.sin(progress * Math.PI);
                 this.visualOffsetY = -this.jumpHeight * jumpCurve;
                 
-                // Terminar el salto
+                // Finish jump
                 if (progress >= 1) {
                     this.isJumping = false;
                     this.visualOffsetY = 0;
-                    // El FSM volverá a idle/walk según perceiveEnvironment
+                    // The FSM will get back to idle/walk recognizing perceiveEnvironment
                 }
             }
         });
@@ -137,17 +130,11 @@ class Hero extends GameObject {
             if (e.key === 'a' || e.key === 'ArrowLeft') this.input.left = false;
             if (e.key === 'd' || e.key === 'ArrowRight') this.input.right = false;
         });
-        if (this.game?.pixiApp?.canvas) {
-            this.game.pixiApp.canvas.addEventListener('pointerdown', (e) => this._onClick(e));
-        }
-    }
-
-    _onClick(e) {
-        //Hero click action (placeholder)
     }
 
     _onKeyX() {
         if (!this.game || !this.game.placeToilet) return;
+        
         //Place a toilet at hero's current world position
         this.game.placeToilet({ x: this.position.x, y: this.position.y });
     }
@@ -188,12 +175,12 @@ class Hero extends GameObject {
         if (this.input.right) this.acceleration.x += this.moveAcceleration;
     }
 
-     // Override render para aplicar el offset visual del salto
+     // Override render to apply visual offset for jumping
     render() {
-        // Llamar al render original del GameObject
+        // Call original GameObject render
         super.render();
         
-        // Aplicar el offset del salto (visual, no afecta la posición real)
+        // Apply jumping offset (visual, not real position)
         this.container.y = this.position.y + this.visualOffsetY;
     }
 
@@ -252,7 +239,7 @@ class Hero extends GameObject {
             return;
         }
 
-        // Third, check movement speed
+        // Third, check movement speed: idle vs walk
         const speed = this.velocity && Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y) || 0;
         const movingThreshold = 0.2;
         
