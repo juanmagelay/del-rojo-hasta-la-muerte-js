@@ -5,8 +5,16 @@ class Hero extends GameObject {
     maxVelocity;
     inputEnabled = false;
     
+    // Jump properties
+    isJumping = false;
+    jumpStartY = 0;
+    jumpHeight = 80; // Max jump height in pixels
+    jumpDuration = 600; // Jump duration in miliseconds
+    jumpElapsed = 0;
+    visualOffsetY = 0; // Visual offset to simulate the jump height
+
     // Finite State Machine for animations
-    state = "idle"; // possible: 'idle', 'walk', 'dead'
+    state = "idle"; // possible: 'idle', 'walk', 'dead', 'jump'
 
     _fsmActive = true; // when true, FSM decides the animation for this hero
     
@@ -46,6 +54,41 @@ class Hero extends GameObject {
                 }
             }
         });
+
+        // Jump state
+        this.fsm.addState('jump', {
+            onEnter() {
+                console.log('Jump started!');
+                this.isJumping = true;
+                this.jumpStartY = this.position.y;
+                this.jumpElapsed = 0;
+                
+                // Usar animación de salto si existe, sino mantener la actual
+                if (this.spritesAnimated.jump) {
+                    this.changeAnimation('jump');
+                } else if (this.spritesAnimated.walk) {
+                    this.changeAnimation('walk');
+                }
+            },
+            onUpdate(deltaTime) {
+                if (!this.isJumping) return;
+                
+                this.jumpElapsed += deltaTime;
+                const progress = Math.min(this.jumpElapsed / this.jumpDuration, 1);
+                
+                // Parábola para el salto (sube y baja suavemente)
+                // Usando sin para un movimiento más natural
+                const jumpCurve = Math.sin(progress * Math.PI);
+                this.visualOffsetY = -this.jumpHeight * jumpCurve;
+                
+                // Terminar el salto
+                if (progress >= 1) {
+                    this.isJumping = false;
+                    this.visualOffsetY = 0;
+                    // El FSM volverá a idle/walk según perceiveEnvironment
+                }
+            }
+        });
         
         // Dead state
         this.fsm.addState('dead', {
@@ -57,14 +100,10 @@ class Hero extends GameObject {
                 this.velocity.x = 0;
                 this.velocity.y = 0;
                 
-                // BRUTAL MOVEMENT: +100 en X, al frente en Z
+                // Fixed movement: +100 X, in front Z
                 this.position.x += 100;
-                this.container.rotation = Math.PI / 2; // Rotar 90 grados a la derecha
-                this.container.zIndex = 9999; // Al frente totalmente en Z
-                
-                console.log('Position after:', { x: this.position.x, y: this.position.y });
-                console.log('Z-index set to:', this.container.zIndex);
-                console.log('Rotation set to:', this.container.rotation, 'radians (90 degrees)');
+                this.container.rotation = Math.PI / 2; // Rotate 90 degrees to the right
+                this.container.zIndex = 9999; // In front Z
                 
                 // Try to play 'death' animation and stop it so it remains visible until restart.
                 this.changeAnimation('death');
@@ -77,7 +116,6 @@ class Hero extends GameObject {
                 
                 // Add red rectangle immediately below the hero
                 this._addDeathRedRectangle();
-                console.log('Red rectangle added');
             }
         });
     }
@@ -90,6 +128,7 @@ class Hero extends GameObject {
             if (e.key === 'a' || e.key === 'ArrowLeft') this.input.left = true;
             if (e.key === 'd' || e.key === 'ArrowRight') this.input.right = true;
             if (e.key.toLowerCase() === 'x') this._onKeyX();
+            if (e.code === 'Space') this._onKeySpace();
         });
         window.addEventListener('keyup', (e) => {
             if (!this.inputEnabled) return;
@@ -111,6 +150,16 @@ class Hero extends GameObject {
         if (!this.game || !this.game.placeToilet) return;
         //Place a toilet at hero's current world position
         this.game.placeToilet({ x: this.position.x, y: this.position.y });
+    }
+
+    _onKeySpace() {
+        //Jump
+        console.log('Jump action triggered');
+        if (this.isJumping) return;
+        if (this.fsm && this.fsm.getState() === 'dead') return;
+        
+        // Activate jump state
+        this.fsm.setState('jump');
     }
 
     _addDeathRedRectangle() {
@@ -139,6 +188,16 @@ class Hero extends GameObject {
         if (this.input.right) this.acceleration.x += this.moveAcceleration;
     }
 
+     // Override render para aplicar el offset visual del salto
+    render() {
+        // Llamar al render original del GameObject
+        super.render();
+        
+        // Aplicar el offset del salto (visual, no afecta la posición real)
+        this.container.y = this.position.y + this.visualOffsetY;
+    }
+
+
     // Method to reset hero to initial state when game restarts
     resetToInitialState() {
         // Reset position to initial spawn position
@@ -150,6 +209,11 @@ class Hero extends GameObject {
         this.velocity.y = 0;
         this.acceleration.x = 0;
         this.acceleration.y = 0;
+
+        // Reset jump state
+        this.isJumping = false;
+        this.jumpElapsed = 0;
+        this.visualOffsetY = 0;
         
         // Reset Z index to normal
         this.container.zIndex = Math.round(this.position.y);
@@ -174,15 +238,28 @@ class Hero extends GameObject {
 
     // Finite State Machine: perceiveEnvironment decides the state based on conditions
     perceiveEnvironment() {
+        
+        // First, check if dead
         const isDead = this.game && typeof this.game.health === 'number' && this.game.health <= 0;
         if (isDead) {
             this.fsm.setState('dead');
             return;
         }
+
+        // Second, check if jumping
+        if (this.isJumping) {
+            this.fsm.setState('jump');
+            return;
+        }
+
+        // Third, check movement speed
         const speed = this.velocity && Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y) || 0;
         const movingThreshold = 0.2;
-        if (speed <= movingThreshold) { this.fsm.setState('idle'); return; }
-        this.fsm.setState('walk');
-
+        
+        if (speed <= movingThreshold) { 
+            this.fsm.setState('idle')
+        } else {
+            this.fsm.setState('walk');
+        }
     }
 }
