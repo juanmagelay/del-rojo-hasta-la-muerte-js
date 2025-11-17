@@ -264,62 +264,69 @@ class GameObject {
     }
 
     _handleCollisions() {
-    if (this.isJumping) return;
-    if (!this.isSolid) return;
-    // Collision with other solid characters
-    for (let other of this.game.characters) {
-      if (other.isJumping) {
-        console.log("is jumping"); 
-        return;
-      };
-      if (other === this) continue;
-      if (!other.isSolid) continue;
-      const collision = checkCircleCollision(
-        this.position, 
-        other.position, 
-        this.collisionRadius, 
-        other.collisionRadius
-      );
-      if (collision) {
-        // 1. Enemy collide with Hero: only damage, DOES NOT move it
-        if (this instanceof Enemy && other instanceof Hero) {
-          if (this.game && typeof this.game._applyHeroDamage === 'function') {
-            const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
-            this.game._applyHeroDamage(6 * deltaSeconds);
-          }
-          // DO NOT separate or modify the speed of the Hero
+      if (!this.isSolid) return;
+    
+      // Collision with other solid characters
+      for (let other of this.game.characters) {
+        // Special cases: jumping hero/enemy do not collide
+        if (other instanceof Hero && other.isJumping && this instanceof Enemy) {
           continue;
         }
-        // 2. Hero collide with Enemy: he only moves it if pressing an arrow
-        if (this instanceof Hero && other instanceof Enemy) {
-          if (this.game && typeof this.game._applyHeroDamage === 'function') {
-            const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
-            this.game._applyHeroDamage(6 * deltaSeconds);
-          }
-          // He only moves it if pressing an arrow
-          if (this.input && (this.input.up || this.input.down || this.input.left || this.input.right)) {
-            separateObjects(
-              this.position, 
-              other.position, 
-              this.collisionRadius, 
-              other.collisionRadius,
-              this, other
-            );
-            this._resolveCollisionVelocity(other);
-          }
+        if (this instanceof Hero && this.isJumping && other instanceof Enemy) {
           continue;
         }
-        // Separate and solve velocity normally for other cases
-        separateObjects(
+
+        // Skip self and non-solid objects
+        if (other === this) continue;
+        if (!other.isSolid) continue;
+        
+        // Check collision
+        const collision = checkCircleCollision(
           this.position, 
           other.position, 
           this.collisionRadius, 
-          other.collisionRadius,
-          this, other
+          other.collisionRadius
         );
-        this._resolveCollisionVelocity(other);
+        if (collision) {
+          // 1. Enemy collide with Hero: only damage, DOES NOT move it
+          if (this instanceof Enemy && other instanceof Hero) {
+            if (this.game && typeof this.game._applyHeroDamage === 'function') {
+              const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
+              this.game._applyHeroDamage(6 * deltaSeconds);
+            }
+            // DO NOT separate or modify the speed of the Hero
+            continue;
+          }
+          // 2. Hero collide with Enemy: he only moves it if pressing an arrow
+          if (this instanceof Hero && other instanceof Enemy) {
+            if (this.game && typeof this.game._applyHeroDamage === 'function') {
+              const deltaSeconds = (this.game.pixiApp.ticker.deltaMS || (1000/60)) / 1000;
+              this.game._applyHeroDamage(6 * deltaSeconds);
+            }
+            // He only moves it if pressing an arrow
+            if (this.input && (this.input.up || this.input.down || this.input.left || this.input.right)) {
+              separateObjects(
+                this.position, 
+                other.position, 
+                this.collisionRadius, 
+                other.collisionRadius,
+                this, other
+              );
+              this._resolveCollisionVelocity(other);
+            }
+            continue;
+          }
+          // Separate and solve velocity normally for other cases
+          separateObjects(
+            this.position, 
+            other.position, 
+            this.collisionRadius, 
+            other.collisionRadius,
+            this, other
+          );
+          this._resolveCollisionVelocity(other);
+        }
       }
-    }
   
   //Collisions with toilets
   const activeToilets = this.game.toilets.filter(t => !t.destroyed);

@@ -11,8 +11,8 @@ class Game {
   remainingSeconds = 60;
   _timerAccumulatorMs = 0;
   uiLayer;
-  health = Infinity;
-  maxHealth = Infinity;
+  health = 100;
+  maxHealth = 100;
   healthBarFill;
   toiletCount = 10;
   toiletIconSprite;

@@ -39,10 +39,10 @@ function separateObjects(obj1, obj2, radius1, radius2, objA, objB) {
   obj2.x -= separationX;
   obj2.y -= separationY;
 
-  if((objA instanceof Hero || objB instanceof Hero) &&
+  /* if((objA instanceof Hero || objB instanceof Hero) &&
     (objA.isJumping || objB.isJumping)) {
       console.log("Hero is jumping")
-    }
+    } */
 }
 
 function limitVector(vector, maxMagnitude) {

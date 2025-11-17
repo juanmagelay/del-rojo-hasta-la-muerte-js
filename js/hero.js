@@ -9,7 +9,7 @@ class Hero extends GameObject {
     isJumping = false;
     jumpStartY = 0;
     jumpHeight = 80; // Max jump height in pixels
-    jumpDuration = 600; // Jump duration in miliseconds
+    jumpDuration = 1000; // Jump duration in miliseconds
     jumpElapsed = 0;
     visualOffsetY = 0; // Visual offset to simulate the jump height
 
@@ -58,7 +58,7 @@ class Hero extends GameObject {
         // Jump state
         this.fsm.addState('jump', {
             onEnter() {
-                console.log('Jump started!');
+                //console.log('Jump started!');
 
                 // Play jump sound
                 soundManager.playJump();    
@@ -94,7 +94,7 @@ class Hero extends GameObject {
                 soundManager.playDead();
                 
                 console.log('HERO DIED! onEnter executed');
-                console.log('Position before:', { x: this.position.x, y: this.position.y });
+                //console.log('Position before:', { x: this.position.x, y: this.position.y });
                 
                 this.inputEnabled = false;
                 this.velocity.x = 0;
