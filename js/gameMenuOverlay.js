@@ -52,6 +52,15 @@ class GameMenuOverlay {
     this.button.addEventListener('click', () => soundManager.playUI());
     
     this.overlay.appendChild(this.button);
+
+    // Create credits element (after button for correct order)
+    this.credits = document.createElement('div');
+    Object.assign(this.credits.style, TEXT_STYLES.onboardingText);
+    this.credits.style.textAlign = 'center';
+    this.credits.style.marginTop = '32px';
+    this.credits.style.marginBottom = '0px';
+    this.credits.innerHTML = 'Designed & developed by <a href="https://www.linkedin.com/in/juanmagelay" target="_blank" rel="noopener noreferrer" style="color: #E3C3A8; text-decoration: underline; cursor: pointer;">Juan Manuel Gelay</a> — 2025';
+    this.overlay.appendChild(this.credits);
   }
 
   _bindEvents() {
@@ -73,6 +82,9 @@ class GameMenuOverlay {
     this.button.textContent = 'Jugar';
     this.overlay.style.display = 'flex';
 
+    // Show credits only on start screen
+    if (this.credits) this.credits.style.display = 'block';
+
     this._createLogoIfNeeded();
     this._showLogo();
     
@@ -85,6 +97,7 @@ class GameMenuOverlay {
 
   showOnboarding() {
     if (this._logoImg) this._logoImg.style.display = 'none';
+    if (this.credits) this.credits.style.display = 'none';
     
     // Play background music for menu/onboarding
     soundManager.startMuchachos();
@@ -310,6 +323,7 @@ class GameMenuOverlay {
   
   _showGameEnd(titleText) {
     if (this._logoImg) this._logoImg.style.display = 'none';
+    if (this.credits) this.credits.style.display = 'none';
     
     this._hideOnboardingElements();
     
