@@ -14,6 +14,7 @@ class GameObject {
     currentAnimation = null;
     spritesheetData = null;
     angle;
+    shadowGraphics;            // Shadow graphic element
     
     //Constructor
     constructor ( spritesheetData, x, y, game ) {
@@ -26,6 +27,9 @@ class GameObject {
         //Container
         this.container = new PIXI.Container();
         this.container.name = "container";
+
+        //Create shadow FIRST (so it renders behind sprites)
+        this._createShadow();
         
         //Vectors
         this.position = { x: x, y: y };
@@ -66,6 +70,27 @@ class GameObject {
         this.collisionRadius = 18;
         this.isSolid = true;
         this.canPushOthers = true;
+    }
+
+    //Create pixel art shadow
+    _createShadow() {
+        this.shadowGraphics = new PIXI.Graphics();
+        
+        // Get sprite width from first animation frame
+        // Since sprites are scaled 2x and are ~13px wide, shadow should be ~26px
+        const shadowWidth = 26;  // Adjust based on your sprite size
+        const shadowHeight = 16;  // Thin ellipse for pixel art style
+        
+        // Draw an ellipse shadow with pixel art style
+        this.shadowGraphics.beginFill(0x000000, 0.3);  // Black with 30% opacity
+        this.shadowGraphics.drawEllipse(0, 0, shadowWidth / 2, shadowHeight / 2);
+        this.shadowGraphics.endFill();
+        
+        // Position shadow at the base of the sprite
+        this.shadowGraphics.y = 0;  // At the feet level
+        
+        // Add shadow to container FIRST (renders behind sprites)
+        this.container.addChildAt(this.shadowGraphics, 0);
     }
 
     //Switch animation (keeps previous visible states off)
@@ -183,11 +208,25 @@ class GameObject {
       // z-order
       this.container.zIndex = Math.round(this.position.y);
 
+      // Update shadow visibility based on jumping state
+      this._updateShadowVisibility();
+
       // Decide which animation should play based on velocity and angle
       this._updateAnimationBasedOnMovement();
 
       // Update animation speed to reflect velocity
       this._updateAnimationSpeed();
+    }
+
+    _updateShadowVisibility() {
+      if (!this.shadowGraphics) return;
+      
+      // Hide shadow when jumping (for Hero or any object with isJumping property)
+      if (this.isJumping) {
+        this.shadowGraphics.visible = false;
+      } else {
+        this.shadowGraphics.visible = true;
+      }
     }
 
     _updateAnimationBasedOnMovement() {
